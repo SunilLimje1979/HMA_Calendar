@@ -1,4 +1,4 @@
-{% load static %}
+<!-- {% load static %}
 {% load pwa %}
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +11,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
     <style>
-        /* Basic Reset */
+        /* General Reset */
         * {
             margin: 0;
             padding: 0;
@@ -20,18 +20,23 @@
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
+            background-color: #a3d8f7;
             overflow-x: hidden;
         }
 
-        h1 {
-            text-align: left;
-            margin: 20px 0;
+        /* Logo Styling */
+        .logo-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .logo-container img {
+            width: 200px;
+            max-width: 50%;
         }
 
         /* Calendar Slider */
-        #calendar-slider-front,
-        #calendar-slider-back {
+        .calendar-slider {
             display: flex;
             overflow-x: auto;
             overflow-y: hidden;
@@ -39,6 +44,7 @@
             gap: 10px;
             padding: 10px;
             scroll-behavior: smooth;
+            justify-content: center;
         }
 
         .calendar-img-container {
@@ -47,8 +53,8 @@
         }
 
         .calendar-img {
-            width: 100%;
-            max-width: 1000px;
+            width: auto;
+            max-width: 90vw;
             height: 80vh;
             object-fit: cover;
             cursor: pointer;
@@ -60,17 +66,18 @@
             z-index: 999;
         }
 
-        /* Flip Button */
-        .flip-btn {
+        /* Toggle Button Icon */
+        .toggle-icon {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            bottom: 2px;
+            left: 50%;
+            transform: translateX(-50%);
             background-color: #007bff;
             color: #fff;
-            padding: 8px 12px;
-            border: none;
+            padding: 10px;
+            border-radius: 50%;
             cursor: pointer;
-            border-radius: 5px;
+            font-size: 1.5em;
             z-index: 1000;
         }
 
@@ -86,58 +93,254 @@
                 height: 75vh;
             }
 
-            .flip-btn {
-                font-size: 14px;
-                padding: 6px 10px;
+            .toggle-icon {
+                font-size: 1.2em;
+                padding: 8px;
             }
         }
     </style>
 </head>
 <body>
-    <h1>HMA Calendar</h1>
-    <button class="flip-btn" id="flip-btn">Back Side</button>
+    
+    <div class="logo-container">
+        <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo">
+    </div>
+
+    
+    <div id="calendar-slider-front" class="calendar-slider">
+        <div class="calendar-img-container">
+            <img src="{% static 'images/January.jpeg' %}" class="calendar-img" data-month="1">
+            <img src="{% static 'images/Feb.jpeg' %}" class="calendar-img" data-month="2">
+            <img src="{% static 'images/March.jpeg' %}" class="calendar-img" data-month="3">
+            <img src="{% static 'images/April.jpeg' %}" class="calendar-img" data-month="4">
+            <img src="{% static 'images/May.jpeg' %}" class="calendar-img" data-month="5">
+            <img src="{% static 'images/June.jpeg' %}" class="calendar-img" data-month="6">
+            <img src="{% static 'images/July.jpeg' %}" class="calendar-img" data-month="7">
+            <img src="{% static 'images/August.jpeg' %}" class="calendar-img" data-month="8">
+            <img src="{% static 'images/Sept.jpeg' %}" class="calendar-img" data-month="9">
+            <img src="{% static 'images/October.jpeg' %}" class="calendar-img" data-month="10">
+            <img src="{% static 'images/Nov.jpeg' %}" class="calendar-img" data-month="11">
+            <img src="{% static 'images/Dec.jpeg' %}" class="calendar-img" data-month="12">
+        </div>
+    </div>
+
+    
+    <div id="calendar-slider-back" class="calendar-slider">
+        <div class="calendar-img-container">
+            <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img" data-month="1">
+            <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img" data-month="2">
+            <img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img" data-month="3">
+            <img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img" data-month="4">
+            <img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img" data-month="5">
+            <img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img" data-month="6">
+            <img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img" data-month="7">
+            <img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img" data-month="8">
+            <img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img" data-month="9">
+            <img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img" data-month="10">
+            <img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img" data-month="11">
+            <img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img" data-month="12">
+        </div>
+    </div>
+
+    
+    <div class="toggle-icon" id="toggle-icon">
+        <i class="fas fa-calendar"></i>
+    </div>
+
+    <script>
+        const toggleIcon = document.getElementById('toggle-icon');
+        const frontSlider = document.getElementById('calendar-slider-front');
+        const backSlider = document.getElementById('calendar-slider-back');
+        const currentMonth = new Date().getMonth() + 1;
+
+        function focusCurrentMonth(slider) {
+            const img = slider.querySelector(`[data-month="${currentMonth}"]`);
+            img.scrollIntoView({ behavior: 'smooth', inline: 'center' });
+        }
+
+        toggleIcon.addEventListener('click', () => {
+            if (frontSlider.style.display === 'none') {
+                frontSlider.style.display = 'flex';
+                backSlider.style.display = 'none';
+                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+            } else {
+                frontSlider.style.display = 'none';
+                backSlider.style.display = 'flex';
+                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
+            }
+            focusCurrentMonth(frontSlider.style.display === 'none' ? backSlider : frontSlider);
+        });
+
+        focusCurrentMonth(frontSlider);
+    </script>
+</body>
+</html> -->
+
+{% load static %}
+{% load pwa %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMA Calendar</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #b0dcf5;
+            overflow-x: hidden;
+        }
+
+        /* Logo Styling */
+        .logo-container {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .logo-container img {
+            width: 200px;
+            max-width: 50%;
+        }
+
+        /* Calendar Slider */
+        .calendar-slider {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            gap: 15px;
+            padding: 10px;
+            scroll-behavior: smooth;
+            justify-content: center;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .calendar-slider::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
+        }
+
+        .calendar-img-container {
+            display: flex;
+            gap: 15px;
+        }
+
+        .calendar-img {
+            width: auto;
+            max-width: 90vw;
+            height: 80vh;
+            object-fit: cover;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .calendar-img.zoomed {
+            transform: scale(2);
+            z-index: 999;
+            position: relative;
+        }
+
+        /* Toggle Button Icon */
+        .toggle-icon {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #007bff;
+            color: #fff;
+            padding: 14px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-icon:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-img {
+                max-width: 100%;
+                height: 75vh;
+            }
+
+            .toggle-icon {
+                font-size: 1.2em;
+                padding: 8px;
+                bottom: 10px;
+                right: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Section -->
+    <div class="logo-container">
+        <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo">
+    </div>
 
     <!-- Front Calendar Slider -->
-    <div id="calendar-slider-front">
+    <div id="calendar-slider-front" class="calendar-slider">
         <div class="calendar-img-container">
-            <img src="{% static 'images/January.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Feb.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/March.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/April.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/May.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/June.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/July.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/August.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Sept.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/October.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Nov.jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Dec.jpeg' %}" class="calendar-img">
-
+            <img src="{% static 'images/January.jpeg' %}" class="calendar-img" data-month="1">
+            <img src="{% static 'images/Feb.jpeg' %}" class="calendar-img" data-month="2">
+            <img src="{% static 'images/March.jpeg' %}" class="calendar-img" data-month="3">
+            <img src="{% static 'images/April.jpeg' %}" class="calendar-img" data-month="4">
+            <img src="{% static 'images/May.jpeg' %}" class="calendar-img" data-month="5">
+            <img src="{% static 'images/June.jpeg' %}" class="calendar-img" data-month="6">
+            <img src="{% static 'images/July.jpeg' %}" class="calendar-img" data-month="7">
+            <img src="{% static 'images/August.jpeg' %}" class="calendar-img" data-month="8">
+            <img src="{% static 'images/Sept.jpeg' %}" class="calendar-img" data-month="9">
+            <img src="{% static 'images/October.jpeg' %}" class="calendar-img" data-month="10">
+            <img src="{% static 'images/Nov.jpeg' %}" class="calendar-img" data-month="11">
+            <img src="{% static 'images/Dec.jpeg' %}" class="calendar-img" data-month="12">
         </div>
     </div>
 
     <!-- Back Calendar Slider -->
-    <div id="calendar-slider-back">
+    <div id="calendar-slider-back" class="calendar-slider" style="display: none;">
         <div class="calendar-img-container">
-            <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img">
-            <img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img">
-
+            <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img" data-month="1">
+            <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img" data-month="2">
+            <img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img" data-month="3">
+            <img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img" data-month="4">
+            <img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img" data-month="5">
+            <img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img" data-month="6">
+            <img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img" data-month="7">
+            <img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img" data-month="8">
+            <img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img" data-month="9">
+            <img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img" data-month="10">
+            <img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img" data-month="11">
+            <img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img" data-month="12">
         </div>
     </div>
 
+    <!-- Toggle Icon -->
+    <div class="toggle-icon" id="toggle-icon">
+        <i class="fas fa-calendar"></i>
+    </div>
+
     <script>
-        // Zoom Functionality
-        document.querySelectorAll('.calendar-img').forEach(img => {
+        const toggleIcon = document.getElementById('toggle-icon');
+        const frontSlider = document.getElementById('calendar-slider-front');
+        const backSlider = document.getElementById('calendar-slider-back');
+        const images = document.querySelectorAll('.calendar-img');
+
+        // Zoom functionality
+        images.forEach(img => {
             img.addEventListener('click', (e) => {
                 if (!img.classList.contains('zoomed')) {
                     img.classList.add('zoomed');
@@ -149,18 +352,47 @@
             });
         });
 
-        // Flip Button Functionality
-        const flipBtn = document.getElementById('flip-btn');
-        const frontSlider = document.getElementById('calendar-slider-front');
-        const backSlider = document.getElementById('calendar-slider-back');
+        // Show current month image first
+        const currentMonth = new Date().getMonth() + 1;
+        const scrollToCurrentMonth = (slider) => {
+            const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
+            if (monthImg) {
+                monthImg.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        };
 
-        flipBtn.addEventListener('click', () => {
+        scrollToCurrentMonth(frontSlider);
+
+        // Detect current visible image
+        const getVisibleMonth = (slider) => {
+            const sliderRect = slider.getBoundingClientRect();
+            for (let img of slider.querySelectorAll('.calendar-img')) {
+                const imgRect = img.getBoundingClientRect();
+                if (
+                    imgRect.left >= sliderRect.left &&
+                    imgRect.right <= sliderRect.right
+                ) {
+                    return img.getAttribute('data-month');
+                }
+            }
+            return currentMonth;
+        };
+
+        // Toggle between sliders and focus on visible image
+        toggleIcon.addEventListener('click', () => {
+            let visibleMonth = getVisibleMonth(frontSlider.style.display === 'none' ? backSlider : frontSlider);
+
             if (frontSlider.style.display === 'none') {
                 frontSlider.style.display = 'flex';
                 backSlider.style.display = 'none';
+                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+                scrollToCurrentMonth(frontSlider);
             } else {
                 frontSlider.style.display = 'none';
                 backSlider.style.display = 'flex';
+                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                const monthImg = backSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
+                monthImg?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
         });
     </script>
