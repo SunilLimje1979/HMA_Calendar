@@ -1,0 +1,168 @@
+{% load static %}
+{% load pwa %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMA Calendar</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        /* Calendar Slider */
+        #calendar-slider-front,
+        #calendar-slider-back {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            gap: 10px;
+            padding: 10px;
+            scroll-behavior: smooth;
+        }
+
+        .calendar-img-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-img {
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .calendar-img.zoomed {
+            transform: scale(2);
+            z-index: 999;
+        }
+
+        /* Flip Button */
+        .flip-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: #fff;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        /* Hide Back Slider Initially */
+        #calendar-slider-back {
+            display: none;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .calendar-img {
+                max-width: 100%;
+                height: 75vh;
+            }
+
+            .flip-btn {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>HMA Calendar</h1>
+    <button class="flip-btn" id="flip-btn">Back Side</button>
+
+    <!-- Front Calendar Slider -->
+    <div id="calendar-slider-front">
+        <div class="calendar-img-container">
+            <img src="{% static 'images/January.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Feb.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/March.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/April.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/May.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/June.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/July.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/August.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Sept.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/October.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Nov.jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Dec.jpeg' %}" class="calendar-img">
+
+        </div>
+    </div>
+
+    <!-- Back Calendar Slider -->
+    <div id="calendar-slider-back">
+        <div class="calendar-img-container">
+            <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img">
+            <img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img">
+
+        </div>
+    </div>
+
+    <script>
+        // Zoom Functionality
+        document.querySelectorAll('.calendar-img').forEach(img => {
+            img.addEventListener('click', (e) => {
+                if (!img.classList.contains('zoomed')) {
+                    img.classList.add('zoomed');
+                    img.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
+                } else {
+                    img.classList.remove('zoomed');
+                    img.style.transformOrigin = 'center';
+                }
+            });
+        });
+
+        // Flip Button Functionality
+        const flipBtn = document.getElementById('flip-btn');
+        const frontSlider = document.getElementById('calendar-slider-front');
+        const backSlider = document.getElementById('calendar-slider-back');
+
+        flipBtn.addEventListener('click', () => {
+            if (frontSlider.style.display === 'none') {
+                frontSlider.style.display = 'flex';
+                backSlider.style.display = 'none';
+            } else {
+                frontSlider.style.display = 'none';
+                backSlider.style.display = 'flex';
+            }
+        });
+    </script>
+</body>
+</html>
