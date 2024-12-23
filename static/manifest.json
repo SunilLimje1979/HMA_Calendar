@@ -11,12 +11,12 @@
     "theme_color": "#A52028",
     "icons": [
         {
-            "src": "/static/images/HMALogo.png",
+            "src": "/HMA_Calendar/static/images/HMALogo.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/static/images/HMALogo.png",
+            "src": "/HMA_Calendar/static/images/HMALogo.png",
             "sizes": "512x512",
             "type": "image/png"
         }
