@@ -8,7 +8,7 @@
     "orientation": "any",
     "start_url": "/HMA_Calendar/",
     "background_color": "#FFFFFF",
-    "theme_color": "#A52028",
+    "theme_color": "#0191da",
     "icons": [
         {
             "src": "/HMA_Calendar/static/images/HMALogo.png",
