@@ -14,110 +14,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
     <style>
-        /* Styling for the content container */
-        .container {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .logo {
-            max-width: 200px;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            font-size: 20px;
-            margin-bottom: 20px;
-        }
-
-        .install-btn {
-            font-size: 16px;
-            padding: 12px 24px;
-            background-color: #109787;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-
-        .install-btn i {
-            margin-right: 8px;
-        }
-
-        .install-btn:hover {
-            background-color: #0f7f72;
-        }
-    </style>
-</head>
-<body>
-    <div class="container" id="app-container">
-        <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" class="logo" id="logo">
-        <p class="message" id="message">{% trans "Download the App to Use our Calendar" %}</p>
-        <button class="install-btn" id="install" hidden>
-            <i class="fas fa-download"></i>
-            {% trans "Download as Mobile App" %}
-        </button>
-    </div>
-
-    <script>
-        let installPrompt = null;
-        const installButton = document.querySelector("#install");
-        const appContainer = document.querySelector("#app-container");
-
-        // URL to redirect after the app is installed
-        const redirectUrl = "/HMA_Calendar/calendar/";
-
-        // Check if the app is already installed and redirect if true
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-            window.location.href = redirectUrl;
-            console.log("redirectUrl");
-        }
-
-        window.addEventListener("beforeinstallprompt", (event) => {
-            event.preventDefault();
-            installPrompt = event;
-            installButton.removeAttribute("hidden");
-        });
-
-        installButton.addEventListener("click", async () => {
-            if (!installPrompt) return;
-            const result = await installPrompt.prompt();
-            console.log(`Install prompt was: ${result.outcome}`);
-            disableInAppInstallPrompt();
-        });
-
-        window.addEventListener("appinstalled", () => {
-            // Redirect to the URL after the app is installed
-            window.location.href = redirectUrl;
-        });
-
-        function disableInAppInstallPrompt() {
-            installPrompt = null;
-            installButton.setAttribute("hidden", "");
-        }
-    </script>
-
-</body>
-</html> {% endcomment %}
-{% load i18n %}
-{% load static %}
-{% load pwa %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>"Default Page"</title>
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
-    <style>
         .container {
             text-align: center;
             display: flex;
@@ -211,5 +107,193 @@
         }
     </script>
 
+</body>
+</html> {% endcomment %}
+{% load i18n %}
+{% load static %}
+{% load pwa %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% trans "Download Our Calendar App" %}</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
+
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #a3d8f7, #eaf6ff);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Logo Styling */
+        .logo {
+            width: 500px;
+            max-width: 100%;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        /* Message Styling */
+        .message {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #004085;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Install Button Styling */
+        .install-btn {
+            font-size: 1em;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .install-btn i {
+            margin-right: 5px;
+        }
+
+        .install-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        /* Fade In Animation */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive Styling */
+        @media (max-width: 768px) {
+            .logo {
+                width: 550px;
+                border-radius:10px;
+            }
+
+            .message {
+                font-size: 1.2em;
+            }
+
+            .install-btn {
+                font-size: 0.9em;
+                padding: 10px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app-container">
+        <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" class="logo" id="logo">
+        <p class="message" id="message">{% trans "Please click the Download button to install the app and access our Calendar" %}</p>
+        <button class="install-btn" id="install" >
+            <i class="fas fa-download"></i>
+            {% trans "Download and Install" %}
+        </button>
+    </div>
+
+    <script>
+        let installPrompt = null;
+        const installButton = document.querySelector("#install");
+        const redirectUrl = "/HMA_Calendar/calendar/";
+
+        /**
+         * Check if the app is running in standalone mode or already installed
+         */
+        function isStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        }
+
+        /**
+         * Redirect if the app is installed or running in standalone mode
+         */
+        function handleRedirection() {
+            if (isStandalone() || localStorage.getItem('app_installed') === 'true') {
+                console.log("App is already installed or in standalone mode, redirecting...");
+                window.location.href = redirectUrl;
+            }
+        }
+
+        handleRedirection();
+
+        /**
+         * Handle beforeinstallprompt event
+         */
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault();
+            installPrompt = event;
+            installButton.removeAttribute("hidden");
+            console.log("beforeinstallprompt triggered");
+        });
+
+        /**
+         * Handle Install Button Click
+         */
+        installButton.addEventListener("click", async () => {
+            if (!installPrompt) return;
+
+            const result = await installPrompt.prompt();
+            if (result.outcome === 'accepted') {
+                console.log("User accepted the install prompt.");
+                localStorage.setItem('app_installed', 'true');
+                redirectToApp();
+            } else {
+                console.log("User dismissed the install prompt.");
+            }
+            installPrompt = null;
+            installButton.setAttribute("hidden", "");
+        });
+
+        /**
+         * Handle App Installed Event
+         */
+        window.addEventListener("appinstalled", () => {
+            console.log("App successfully installed, redirecting...");
+            localStorage.setItem('app_installed', 'true');
+            redirectToApp();
+        });
+
+        /**
+         * Redirect to the calendar page
+         */
+        function redirectToApp() {
+            window.location.href = redirectUrl;
+        }
+    </script>
 </body>
 </html>

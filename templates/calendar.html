@@ -20,19 +20,20 @@
 
         body {
             font-family: Arial, sans-serif;
-            background-color: #a3d8f7;
+            background-color: #b0dcf5;
             overflow-x: hidden;
         }
 
         /* Logo Styling */
         .logo-container {
-            text-align: center;
+            text-align: left;
             margin: 10px 0;
         }
 
         .logo-container img {
-            width: 200px;
+            width: 150px;
             max-width: 50%;
+            border-radius: 10px;
         }
 
         /* Calendar Slider */
@@ -41,15 +42,21 @@
             overflow-x: auto;
             overflow-y: hidden;
             white-space: nowrap;
-            gap: 10px;
+            gap: 15px;
             padding: 10px;
             scroll-behavior: smooth;
             justify-content: center;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .calendar-slider::-webkit-scrollbar {
+            display: none; /* Chrome, Safari */
         }
 
         .calendar-img-container {
             display: flex;
-            gap: 10px;
+            gap: 15px;
         }
 
         .calendar-img {
@@ -58,35 +65,35 @@
             height: 80vh;
             object-fit: cover;
             cursor: pointer;
+            border-radius: 10px;
             transition: transform 0.3s ease-in-out;
         }
 
         .calendar-img.zoomed {
             transform: scale(2);
             z-index: 999;
+            position: relative;
         }
 
         /* Toggle Button Icon */
         .toggle-icon {
             position: fixed;
-            bottom: 2px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 30px;
+            right: 30px;
             background-color: #007bff;
             color: #fff;
-            padding: 10px;
+            padding: 14px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 1.5em;
             z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        /* Hide Back Slider Initially */
-        #calendar-slider-back {
-            display: none;
+        .toggle-icon:hover {
+            background-color: #0056b3;
         }
 
-        /* Mobile Responsiveness */
         @media (max-width: 768px) {
             .calendar-img {
                 max-width: 100%;
@@ -96,6 +103,8 @@
             .toggle-icon {
                 font-size: 1.2em;
                 padding: 8px;
+                bottom: 10px;
+                right: 20px;
             }
         }
     </style>
@@ -125,7 +134,7 @@
     </div>
 
     
-    <div id="calendar-slider-back" class="calendar-slider">
+    <div id="calendar-slider-back" class="calendar-slider" style="display: none;">
         <div class="calendar-img-container">
             <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img" data-month="1">
             <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img" data-month="2">
@@ -144,34 +153,71 @@
 
     
     <div class="toggle-icon" id="toggle-icon">
-        <i class="fas fa-calendar"></i>
+        <i class="fas fa-sync-alt"></i>
     </div>
 
     <script>
         const toggleIcon = document.getElementById('toggle-icon');
         const frontSlider = document.getElementById('calendar-slider-front');
         const backSlider = document.getElementById('calendar-slider-back');
+        const images = document.querySelectorAll('.calendar-img');
+
+        // Zoom functionality
+        images.forEach(img => {
+            img.addEventListener('click', (e) => {
+                if (!img.classList.contains('zoomed')) {
+                    img.classList.add('zoomed');
+                    img.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
+                } else {
+                    img.classList.remove('zoomed');
+                    img.style.transformOrigin = 'center';
+                }
+            });
+        });
+
+        // Show current month image first
         const currentMonth = new Date().getMonth() + 1;
+        const scrollToCurrentMonth = (slider) => {
+            const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
+            if (monthImg) {
+                monthImg.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            }
+        };
 
-        function focusCurrentMonth(slider) {
-            const img = slider.querySelector(`[data-month="${currentMonth}"]`);
-            img.scrollIntoView({ behavior: 'smooth', inline: 'center' });
-        }
+        scrollToCurrentMonth(frontSlider);
 
+        // Detect current visible image
+        const getVisibleMonth = (slider) => {
+            const sliderRect = slider.getBoundingClientRect();
+            for (let img of slider.querySelectorAll('.calendar-img')) {
+                const imgRect = img.getBoundingClientRect();
+                if (
+                    imgRect.left >= sliderRect.left &&
+                    imgRect.right <= sliderRect.right
+                ) {
+                    return img.getAttribute('data-month');
+                }
+            }
+            return currentMonth;
+        };
+
+        // Toggle between sliders and focus on visible image
         toggleIcon.addEventListener('click', () => {
+            let visibleMonth = getVisibleMonth(frontSlider.style.display === 'none' ? backSlider : frontSlider);
+
             if (frontSlider.style.display === 'none') {
                 frontSlider.style.display = 'flex';
                 backSlider.style.display = 'none';
-                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                scrollToCurrentMonth(frontSlider);
             } else {
                 frontSlider.style.display = 'none';
                 backSlider.style.display = 'flex';
-                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+                const monthImg = backSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
+                monthImg?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
-            focusCurrentMonth(frontSlider.style.display === 'none' ? backSlider : frontSlider);
         });
-
-        focusCurrentMonth(frontSlider);
     </script>
 </body>
 </html> -->
@@ -204,13 +250,43 @@
 
         /* Logo Styling */
         .logo-container {
-            text-align: center;
+            text-align: left;
             margin: 10px 0;
+            position: relative;
         }
 
         .logo-container img {
-            width: 200px;
+            width: 130px;
             max-width: 50%;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow effect */
+        }
+
+        /* Three Dot Menu */
+        .three-dot-menu {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: #0d0d0e;
+        }
+
+        .about-us-text {
+            display: none;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #fff;
+            padding: 5px 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .about-us-text:hover {
+            background-color: #007bff;
+            color: #fff;
         }
 
         /* Calendar Slider */
@@ -290,6 +366,12 @@
     <!-- Logo Section -->
     <div class="logo-container">
         <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo">
+        <div class="three-dot-menu" id="three-dot-menu">
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+        <div class="about-us-text" id="about-us-text">
+            <a href="https://www.google.com/" target="_blank" style="text-decoration: none; color: inherit;">About Us</a>
+        </div>
     </div>
 
     <!-- Front Calendar Slider -->
@@ -330,7 +412,7 @@
 
     <!-- Toggle Icon -->
     <div class="toggle-icon" id="toggle-icon">
-        <i class="fas fa-calendar"></i>
+        <i class="fas fa-sync-alt"></i>
     </div>
 
     <script>
@@ -363,7 +445,19 @@
 
         scrollToCurrentMonth(frontSlider);
 
-        // Detect current visible image
+        // Three dot menu toggle
+        document.getElementById('three-dot-menu').addEventListener('click', () => {
+            const aboutUsText = document.getElementById('about-us-text');
+            aboutUsText.style.display = aboutUsText.style.display === 'none' || aboutUsText.style.display === '' ? 'block' : 'none';
+        });
+
+        // Hide "About Us" and reset when the link is clicked
+        document.getElementById('about-us-text').addEventListener('click', () => {
+            const aboutUsText = document.getElementById('about-us-text');
+            aboutUsText.style.display = 'none';  // Hide the About Us text
+        });
+
+        // Detect visible month
         const getVisibleMonth = (slider) => {
             const sliderRect = slider.getBoundingClientRect();
             for (let img of slider.querySelectorAll('.calendar-img')) {
@@ -385,12 +479,12 @@
             if (frontSlider.style.display === 'none') {
                 frontSlider.style.display = 'flex';
                 backSlider.style.display = 'none';
-                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
+                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
                 scrollToCurrentMonth(frontSlider);
             } else {
                 frontSlider.style.display = 'none';
                 backSlider.style.display = 'flex';
-                toggleIcon.innerHTML = '<i class="fas fa-sync-alt"></i>';
+                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
                 const monthImg = backSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
                 monthImg?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             }
