@@ -7,16 +7,16 @@
     "display": "standalone",
     "orientation": "any",
     "start_url": "/HMA_Calendar/calendar/",
-    "background_color": "#FFFFFF",
+    "background_color": "#b0dcf5",
     "theme_color": "#0191da",
     "icons": [
         {
-            "src": "/HMA_Calendar/static/images/HMALogo.png",
+            "src": "/HMA_Calendar/static/images/HMALogoicon.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/HMA_Calendar/static/images/HMALogo.png",
+            "src": "/HMA_Calendar/static/images/HMALogoicon.png",
             "sizes": "512x512",
             "type": "image/png"
         }
