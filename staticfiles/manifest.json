@@ -11,14 +11,20 @@
     "theme_color": "#0191da",
     "icons": [
         {
-            "src": "/HMA_Calendar/static/images/HMALogoicon.png",
+            "src": "/HMA_Calendar/static/images/mobileappicon.png",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "/HMA_Calendar/static/images/HMALogoicon.png",
+            "src": "/HMA_Calendar/static/images/mobileappicon.png",
             "sizes": "512x512",
             "type": "image/png"
+        },
+        {
+            "src": "/HMA_Calendar/static/images/mobileappicon.png",
+            "sizes": "1024x1024",
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }
