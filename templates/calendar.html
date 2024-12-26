@@ -331,7 +331,7 @@
         /* Toggle Button Icon Styling */
         .toggle-icon {
             position: fixed;
-            bottom: 30px;
+            bottom: 40px;
             right: 30px;
             background-color: #007bff;
             color: #fff;
@@ -377,6 +377,22 @@
         .navbar-brand img {
             box-shadow: none;
         }
+
+        .calendar-slider {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 1;
+        }
+
+        .calendar-slider.hidden {
+            opacity: 0;
+        }
+
+        /* .icon-img {
+            width: 100%;
+            height: 70%;
+            object-fit: contain; 
+            filter: brightness(0) invert(1); 
+        } */
 
     </style>
 </head>
@@ -446,6 +462,7 @@
     <!-- Toggle Icon -->
     <div class="toggle-icon" id="toggle-icon">
         <i class="fas fa-file-alt"></i>
+        <!-- <img src="/static/images/turn-page.png" alt="Toggle Icon" class="icon-img"> -->
     </div>
 </div>
     <script>
@@ -467,16 +484,23 @@
             });
         });
 
-        // Show current month image first
+        // Smoothly scroll to the current month on page load
         const currentMonth = new Date().getMonth() + 1;
+
         const scrollToCurrentMonth = (slider) => {
             const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
             if (monthImg) {
-                monthImg.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                slider.style.scrollBehavior = 'auto'; // Disable smooth scroll initially
+                monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
+                setTimeout(() => {
+                    slider.style.scrollBehavior = 'smooth'; // Re-enable smooth scroll
+                }, 100); 
             }
         };
 
+        // Preload both sliders to ensure proper scrolling
         scrollToCurrentMonth(frontSlider);
+        scrollToCurrentMonth(backSlider);
 
         // Three dot menu toggle
         document.getElementById('three-dot-menu').addEventListener('click', () => {
@@ -505,22 +529,43 @@
             return currentMonth;
         };
 
-        // Toggle between sliders and focus on visible image
-        toggleIcon.addEventListener('click', () => {
-            let visibleMonth = getVisibleMonth(frontSlider.style.display === 'none' ? backSlider : frontSlider);
 
-            if (frontSlider.style.display === 'none') {
-                frontSlider.style.display = 'flex';
-                backSlider.style.display = 'none';
-                toggleIcon.innerHTML = '<i class="fas fa-file-alt"></i>';
-                scrollToCurrentMonth(frontSlider);
-            } else {
-                frontSlider.style.display = 'none';
-                backSlider.style.display = 'flex';
-                toggleIcon.innerHTML = '<i class="fas fa-calendar"></i>';
-                const monthImg = backSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
-                monthImg?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            }
+        // Toggle functionality with smooth transitions
+        toggleIcon.addEventListener('click', () => {
+            // let visibleMonth = currentMonth;
+
+            const activeSlider = frontSlider.style.display === 'none' ? backSlider : frontSlider;
+            const inactiveSlider = frontSlider.style.display === 'none' ? frontSlider : backSlider;
+
+            // Get the currently visible month on the active slider
+            const visibleMonth = getVisibleMonth(activeSlider);
+
+            // Hide active slider and prepare inactive slider
+            activeSlider.style.opacity = '0';
+            activeSlider.style.transition = 'opacity 0.3s ease-in-out';
+
+            setTimeout(() => {
+                activeSlider.style.display = 'none';
+                inactiveSlider.style.display = 'flex';
+                
+                // Scroll to the corresponding month on the new slider
+                const monthImg = inactiveSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
+                if (monthImg) {
+                    inactiveSlider.style.scrollBehavior = 'auto';
+                    monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
+                    setTimeout(() => {
+                        inactiveSlider.style.scrollBehavior = 'smooth';
+                    }, 100);
+                }
+
+                inactiveSlider.style.opacity = '1';
+                inactiveSlider.style.transition = 'opacity 0.3s ease-in-out';
+            }, 300);
+
+            // Update the toggle icon
+            toggleIcon.innerHTML = activeSlider === frontSlider 
+                ? '<i class="fas fa-calendar"></i>' 
+                : '<i class="fas fa-file-alt"></i>';
         });
     </script>
      
