@@ -234,6 +234,8 @@
     <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
+    <script src="https://hammerjs.github.io/dist/hammer.min.js"></script>
+
     <style>
         /* General Reset */
         * {
@@ -322,11 +324,24 @@
             transition: transform 0.3s ease-in-out;
         }
 
+        .calendar-img {
+            transition: transform 0.3s ease-in-out;
+            touch-action: none; /* Prevent default gestures like scrolling on pinch */
+            z-index: 1;
+        }
+
         .calendar-img.zoomed {
             transform: scale(2);
             z-index: 999;
             position: relative;
+            transform-origin: center center;
         }
+
+        /* .calendar-img.zoomed {
+            transform: scale(2);
+            z-index: 999;
+            position: relative;
+        } */
 
         /* Toggle Button Icon Styling */
         .toggle-icon {
@@ -574,18 +589,51 @@
         const backSlider = document.getElementById('calendar-slider-back');
         const images = document.querySelectorAll('.calendar-img');
 
-        // Zoom functionality
         images.forEach(img => {
-            img.addEventListener('click', (e) => {
-                if (!img.classList.contains('zoomed')) {
-                    img.classList.add('zoomed');
-                    img.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
-                } else {
-                    img.classList.remove('zoomed');
-                    img.style.transformOrigin = 'center';
-                }
+            let scale = 1;
+            let lastScale = 1;
+
+            // Initialize Hammer.js on each image
+            const hammer = new Hammer(img);
+
+            // Enable pinch gestures
+            hammer.get('pinch').set({ enable: true });
+
+            // Handle pinch start
+            hammer.on('pinchstart', () => {
+                lastScale = scale; // Store the last scale value
+            });
+
+            // Handle pinch (scaling)
+            hammer.on('pinchmove', (event) => {
+                scale = Math.max(1, Math.min(lastScale * event.scale, 4)); // Limit zoom scale (1x to 4x)
+                img.style.transform = `scale(${scale})`;
+                img.style.transformOrigin = 'center center';
+            });
+
+            // Handle pinch end
+            hammer.on('pinchend', () => {
+                lastScale = scale; // Update last scale
+            });
+
+            // Double-tap to reset zoom
+            hammer.on('doubletap', () => {
+                scale = 1;
+                img.style.transform = 'scale(1)';
             });
         });
+        // Zoom functionality
+        // images.forEach(img => {
+        //     img.addEventListener('click', (e) => {
+        //         if (!img.classList.contains('zoomed')) {
+        //             img.classList.add('zoomed');
+        //             img.style.transformOrigin = `${e.offsetX}px ${e.offsetY}px`;
+        //         } else {
+        //             img.classList.remove('zoomed');
+        //             img.style.transformOrigin = 'center';
+        //         }
+        //     });
+        // });
 
         // Smoothly scroll to the current month on page load with preloading
         const currentMonth = new Date().getMonth() + 1;
