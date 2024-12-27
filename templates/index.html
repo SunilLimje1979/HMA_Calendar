@@ -215,6 +215,37 @@
                 padding: 10px 20px;
             }
         }
+
+        /* iOS Modal Styling */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            max-width: 400px;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 1.5em;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -225,6 +256,26 @@
             <i class="fas fa-download"></i>
             {% trans "Download and Install" %}
         </button>
+
+         <!-- iOS Install Button -->
+        <button id="show-ios-install-modal" class="btn btn-success" style="display: none; background-color: #007bff;">
+            <i class="fas fa-download"></i>
+            Instruction For Install in iOS
+        </button>
+    </div>
+
+    <!-- iOS Modal -->
+    <div id="ios-install-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h2>How to Install This App on iOS</h2>
+            <p>Follow these steps to add this application to your home screen:</p>
+            <ol>
+                <li>Open the Share menu by tapping the "Share" icon at the bottom of your screen.</li>
+                <li>In the Share menu, find and tap on "Add to Home Screen".</li>
+                <li>Follow the on-screen prompts to confirm and add the app to your home screen.</li>
+            </ol>
+        </div>
     </div>
 
     <script>
@@ -294,6 +345,47 @@
         function redirectToApp() {
             window.location.href = redirectUrl;
         }
+    </script>
+
+    <script>
+        {% comment %} let installPrompt = null; {% endcomment %}
+        {% comment %} const installButton = document.querySelector("#install"); {% endcomment %}
+        const iosModal = document.getElementById("ios-install-modal");
+        const showModalBtn = document.getElementById("show-ios-install-modal");
+        const closeModalBtn = iosModal.querySelector(".close-btn");
+        {% comment %} const redirectUrl = "/HMA_Calendar/calendar/"; {% endcomment %}
+
+        function isIos() {
+            return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
+        }
+
+        function isInStandaloneMode() {
+            return ('standalone' in window.navigator) && window.navigator.standalone;
+        }
+
+        if (isIos() && !isInStandaloneMode()) {
+            showModalBtn.style.display = 'block';
+        }
+
+        showModalBtn.addEventListener("click", () => {
+            iosModal.style.display = "flex";
+        });
+
+        closeModalBtn.addEventListener("click", () => {
+            iosModal.style.display = "none";
+        });
+
+        window.addEventListener("beforeinstallprompt", (event) => {
+            event.preventDefault();
+            installPrompt = event;
+            installButton.removeAttribute("hidden");
+        });
+
+        installButton.addEventListener("click", async () => {
+            if (!installPrompt) return;
+            const result = await installPrompt.prompt();
+            console.log(`Install prompt was: ${result.outcome}`);
+        });
     </script>
 </body>
 </html>
