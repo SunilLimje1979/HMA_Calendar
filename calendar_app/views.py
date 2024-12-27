@@ -10,3 +10,6 @@ def index(request):
 # Second Page - Calendar with Slider
 def calendar_view(request):
     return render(request, 'calendar.html')
+
+# def demo(request):
+#     return render(request,'demo.html')
