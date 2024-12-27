@@ -88,7 +88,7 @@
             gap: 15px;
         }
 
-        .calendar-img {
+        /* .calendar-img {
             width: auto;
             max-width: 90vw;
             height: 75vh;
@@ -96,6 +96,16 @@
             cursor: pointer;
             border-radius: 10px;
             transition: transform 0.3s ease-in-out;
+        } */
+        /* Calendar Image Styling */
+        .calendar-img {
+            width: 100%;
+            max-width: 90vw; /* Responsive constraint */
+            height: auto; /* Maintain aspect ratio */
+            max-height: 75vh; /* Prevent excessive height on large screens */
+            object-fit: cover; /* Ensure proper scaling */
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
         }
 
         /* .calendar-img.zoomed {
@@ -188,6 +198,9 @@
             transition: transform 0.3s ease-in-out;
             transform-origin: center center;
         } */
+        /* Calendar Specific Styles */
+        
+         
 
 
 
@@ -250,7 +263,7 @@
         <img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img">
     </div>
 </div>
-    <script>
+    <!-- <script>
         const toggleIcon = document.getElementById('toggle-icon');
         const frontSlider = document.getElementById('calendar-slider-front');
         const backSlider = document.getElementById('calendar-slider-back');
@@ -435,6 +448,160 @@
                 img.style.transition = 'transform 0.3s ease';
             });
         });
-    </script>  
+    </script>   -->
+    <script>
+        // ======= Global Variables =======
+        const toggleIcon = document.getElementById('toggle-icon');
+        const frontSlider = document.getElementById('calendar-slider-front');
+        const backSlider = document.getElementById('calendar-slider-back');
+        const images = document.querySelectorAll('.calendar-img');
+        let currentMonth = new Date().getMonth() + 1;
+
+        // ======= Smooth Scroll to Current Month =======
+        const scrollToCurrentMonth = (slider) => {
+            const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
+            if (monthImg) {
+                slider.style.scrollBehavior = 'auto'; // Disable smooth scroll initially
+                monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
+                setTimeout(() => {
+                    slider.style.scrollBehavior = 'smooth'; // Re-enable smooth scroll
+                }, 100); 
+            }
+        };
+
+        // ======= Preload Images =======
+        const preloadImages = (slider, callback) => {
+            const sliderImages = slider.querySelectorAll('.calendar-img');
+            let loadedCount = 0;
+
+            sliderImages.forEach(img => {
+                if (img.complete) {
+                    loadedCount++;
+                } else {
+                    img.onload = () => {
+                        loadedCount++;
+                        if (loadedCount === sliderImages.length) callback();
+                    };
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${img.src}`);
+                        loadedCount++;
+                        if (loadedCount === sliderImages.length) callback();
+                    };
+                }
+            });
+
+            if (loadedCount === sliderImages.length) callback();
+        };
+
+        // ======= Handle Initial Load =======
+        window.addEventListener('load', () => {
+            preloadImages(frontSlider, () => scrollToCurrentMonth(frontSlider));
+            preloadImages(backSlider, () => scrollToCurrentMonth(backSlider));
+            images.forEach(img => {
+                img.style.height = img.naturalHeight + 'px';
+            });
+        });
+
+        // ======= Three-dot Menu Toggle =======
+        document.getElementById('three-dot-menu').addEventListener('click', () => {
+            const aboutUsText = document.getElementById('about-us-text');
+            aboutUsText.style.display = (aboutUsText.style.display === 'none' || aboutUsText.style.display === '') 
+                ? 'block' : 'none';
+        });
+
+        document.getElementById('about-us-text').addEventListener('click', () => {
+            document.getElementById('about-us-text').style.display = 'none';
+        });
+
+        // ======= Detect Visible Month =======
+        const getVisibleMonth = (slider) => {
+            const sliderRect = slider.getBoundingClientRect();
+            for (let img of slider.querySelectorAll('.calendar-img')) {
+                const imgRect = img.getBoundingClientRect();
+                if (imgRect.left >= sliderRect.left && imgRect.right <= sliderRect.right) {
+                    return img.getAttribute('data-month');
+                }
+            }
+            return currentMonth;
+        };
+
+        // ======= Slider Toggle with Smooth Transition =======
+        toggleIcon.addEventListener('click', () => {
+            const activeSlider = frontSlider.style.display === 'none' ? backSlider : frontSlider;
+            const inactiveSlider = frontSlider.style.display === 'none' ? frontSlider : backSlider;
+            const visibleMonth = getVisibleMonth(activeSlider);
+
+            activeSlider.style.opacity = '0';
+            activeSlider.style.transition = 'opacity 0.3s ease-in-out';
+
+            setTimeout(() => {
+                activeSlider.style.display = 'none';
+                inactiveSlider.style.display = 'flex';
+                preloadImages(inactiveSlider, () => {
+                    const monthImg = inactiveSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
+                    if (monthImg) {
+                        inactiveSlider.style.scrollBehavior = 'auto';
+                        monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
+                        setTimeout(() => inactiveSlider.style.scrollBehavior = 'smooth', 100);
+                    }
+
+                    inactiveSlider.style.opacity = '1';
+                    inactiveSlider.style.transition = 'opacity 0.3s ease-in-out';
+                });
+            }, 300);
+        });
+
+        // ======= Pinch-to-Zoom =======
+        images.forEach(img => {
+            let initialDistance = 0;
+            let initialScale = 1;
+            let initialTouch1 = null;
+            let initialTouch2 = null;
+            const minScale = 1;
+            const maxScale = 4;
+
+            img.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    initialTouch1 = e.touches[0];
+                    initialTouch2 = e.touches[1];
+                    initialDistance = Math.sqrt(
+                        (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
+                        (initialTouch1.pageY - initialTouch2.pageY) ** 2
+                    );
+                    initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
+                    e.preventDefault();
+                }
+            });
+
+            img.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const distance = Math.sqrt(
+                        (touch1.pageX - touch2.pageX) ** 2 + 
+                        (touch1.pageY - touch2.pageY) ** 2
+                    );
+                    let scale = initialScale * (distance / initialDistance);
+                    scale = Math.max(minScale, Math.min(scale, maxScale));
+
+                    img.style.transform = `scale(${scale})`;
+                    img.style.transition = 'transform 0s';
+                    img.style.transformOrigin = `${(touch1.pageX + touch2.pageX) / 2}px ${(touch1.pageY + touch2.pageY) / 2}px`;
+                }
+            });
+
+            img.addEventListener('touchend', () => {
+                initialTouch1 = null;
+                initialTouch2 = null;
+                img.style.transition = 'transform 0.3s ease';
+            });
+
+            img.addEventListener('click', () => {
+                img.style.transform = 'scale(1)';
+                img.style.transition = 'transform 0.3s ease';
+            });
+        });
+
+    </script>
 </body>
 </html>
