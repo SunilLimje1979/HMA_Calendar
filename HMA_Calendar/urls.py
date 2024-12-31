@@ -22,5 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('HMA_Calendar/admin/', admin.site.urls),
     path('HMA_Calendar/',include('calendar_app.urls')),
+    path('cal2025/admin/', admin.site.urls),
+    path('cal2025/', include('calendar_app.urls')),
     path('', include('pwa.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
