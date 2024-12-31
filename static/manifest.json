@@ -6,7 +6,7 @@
     "lang": "en-US",
     "display": "standalone",
     "orientation": "any",
-    "start_url": "/HMA_Calendar/calendar/",
+    "start_url": "/cal2025/calendar/",
     "background_color": "#b0dcf5",
     "theme_color": "#0191da",
     "icons": [
