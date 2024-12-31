@@ -1,7 +1,7 @@
 {
-    "name": "Calender-App By Hadapsar Medical Association",
-    "short_name": "HMA-Calender",
-    "description": "HMA-Calender Web-Pwa App",
+    "name": "Calendar-App By Hadapsar Medical Association",
+    "short_name": "HMA-Calendar",
+    "description": "HMA-Calendar Web-Pwa App",
     "dir": "auto",
     "lang": "en-US",
     "display": "standalone",

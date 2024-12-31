@@ -1,628 +1,3 @@
-<!-- {% load static %}
-{% load pwa %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
-    <title>HMA Calendar</title>
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-    <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
-    <style>
-        /* General Reset */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #b0dcf5;
-            overflow-x: hidden;
-        }
-
-        .calendar-container {
-            margin-top: 70px;
-            position: relative;
-        }
-
-        .calendar-slider {
-            display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            gap: 15px;
-            padding: 10px;
-            scroll-behavior: smooth;
-            justify-content: center;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        .calendar-slider::-webkit-scrollbar {
-            display: none;
-        }
-
-        .calendar-img-container {
-            display: flex;
-            gap: 15px;
-        }
-
-        .calendar-img {
-            width: auto;
-            max-width: 90vw;
-            height: 75vh;
-            object-fit: cover;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: transform 0.3s ease-in-out;
-            user-select: none;
-        }
-
-        .toggle-icon {
-            position: fixed;
-            bottom: 40px;
-            right: 30px;
-            background-color: rgba(255, 255, 255, 0.975);
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        .toggle-icon img.icon-img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-            padding: 10px;
-            transition: transform 0.3s ease-in-out;
-        }
-
-        @media (max-width: 768px) {
-            .calendar-img {
-                max-width: 100%;
-                height: 75vh;
-            }
-
-            .toggle-icon {
-                width: 60px;
-                height: 60px;
-                font-size: 1.5em;
-            }
-        }
-
-        .navbar {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
-            background-color: #005ba6 !important;
-        }
-
-        .calendar-slider {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 1;
-        }
-
-        .calendar-slider.hidden {
-            opacity: 0;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar fixed-top shadow-sm bg-white px-3 d-flex justify-content-between align-items-center" style="background-color:#005ba6;">
-        <div class="navbar-brand">
-            <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" style="width: 80px; height: auto; border-radius: 5px;">
-        </div>
-        <div class="three-dot-menu" id="three-dot-menu">
-            <i class="fas fa-ellipsis-v"></i>
-        </div>
-        <div class="about-us-text" id="about-us-text">
-            <a href="https://www.google.com/" target="_blank" style="text-decoration: none; color: inherit;">About Us</a>
-        </div>
-    </nav>
-
-    <div class="calendar-container">
-        <div id="calendar-slider-front" class="calendar-slider">
-            <div class="calendar-img-container">
-                <img src="{% static 'images/January.jpeg' %}" class="calendar-img" data-month="1" id="calendar-img-1">
-                <img src="{% static 'images/Feb.jpeg' %}" class="calendar-img" data-month="2" id="calendar-img-2">
-                <img src="{% static 'images/March.jpeg' %}" class="calendar-img" data-month="3" id="calendar-img-3">
-                <img src="{% static 'images/April.jpeg' %}" class="calendar-img" data-month="4" id="calendar-img-4">
-                <img src="{% static 'images/May.jpeg' %}" class="calendar-img" data-month="5" id="calendar-img-5">
-                <img src="{% static 'images/June.jpeg' %}" class="calendar-img" data-month="6" id="calendar-img-6">
-                <img src="{% static 'images/July.jpeg' %}" class="calendar-img" data-month="7" id="calendar-img-7">
-                <img src="{% static 'images/August.jpeg' %}" class="calendar-img" data-month="8" id="calendar-img-8">
-                <img src="{% static 'images/Sept.jpeg' %}" class="calendar-img" data-month="9" id="calendar-img-9">
-                <img src="{% static 'images/October.jpeg' %}" class="calendar-img" data-month="10" id="calendar-img-10">
-                <img src="{% static 'images/Nov.jpeg' %}" class="calendar-img" data-month="11" id="calendar-img-11">
-                <img src="{% static 'images/Dec.jpeg' %}" class="calendar-img" data-month="12" id="calendar-img-12">
-            </div>
-        </div>
-
-        <div id="calendar-slider-back" class="calendar-slider" style="display: none;">
-            <div class="calendar-img-container">
-                <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img" data-month="1" id="calendar-img-back-1">
-                <img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img" data-month="2" id="calendar-img-back-2">
-                <img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img" data-month="3" id="calendar-img-back-3">
-                <img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img" data-month="4" id="calendar-img-back-4">
-                <img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img" data-month="5" id="calendar-img-back-5">
-                <img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img" data-month="6" id="calendar-img-back-6">
-                <img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img" data-month="7" id="calendar-img-back-7">
-                <img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img" data-month="8" id="calendar-img-back-8">
-                <img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img" data-month="9" id="calendar-img-back-9">
-                <img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img" data-month="10" id="calendar-img-back-10">
-                <img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img" data-month="11" id="calendar-img-back-11">
-                <img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img" data-month="12" id="calendar-img-back-12">
-            </div>
-        </div>
-
-        <div class="toggle-icon" id="toggle-icon">
-            <img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img">
-        </div>
-    </div>
-
-    <script>
-       const canvasEl = document.createElement('canvas');
-        const ctx = canvasEl.getContext('2d');
-        let image = null;
-
-        // State variables
-        let zoom = 1; 
-        let minZoom = 0.5;
-        let maxZoom = 3;
-        let panX = 0;
-        let panY = 0;
-        let isDragging = false;
-        let startPanX = 0;
-        let startPanY = 0;
-        let mouseX = 0;
-        let mouseY = 0;
-
-        // Append the canvas dynamically to the body
-        canvasEl.style.position = 'fixed';
-        canvasEl.style.top = '0';
-        canvasEl.style.left = '0';
-        canvasEl.style.width = '100vw';
-        canvasEl.style.height = '100vh';
-        canvasEl.style.background = 'rgba(0,0,0,0.9)';
-        canvasEl.style.display = 'none';
-        canvasEl.style.zIndex = '2000';
-        document.body.appendChild(canvasEl);
-
-        // Adjust canvas resolution for high DPI displays
-        function resizeCanvas() {
-            canvasEl.width = window.innerWidth * window.devicePixelRatio;
-            canvasEl.height = window.innerHeight * window.devicePixelRatio;
-            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-        }
-
-        // Load image into canvas
-        function loadImage(src) {
-            return new Promise((resolve) => {
-                const img = new Image();
-                img.src = src;
-                img.onload = () => resolve(img);
-            });
-        }
-
-        // Draw the image with pan and zoom applied
-        function drawImage() {
-            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
-
-            const canvasWidth = canvasEl.width / window.devicePixelRatio;
-            const canvasHeight = canvasEl.height / window.devicePixelRatio;
-
-            const drawWidth = image.width * zoom;
-            const drawHeight = image.height * zoom;
-
-            const offsetX = (canvasWidth - drawWidth) / 2 + panX;
-            const offsetY = (canvasHeight - drawHeight) / 2 + panY;
-
-            ctx.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
-        }
-
-        // Handle mouse events for dragging
-        canvasEl.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startPanX = e.clientX - panX;
-            startPanY = e.clientY - panY;
-        });
-
-        canvasEl.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                panX = e.clientX - startPanX;
-                panY = e.clientY - startPanY;
-                drawImage();
-            }
-        });
-
-        canvasEl.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
-        canvasEl.addEventListener('mouseleave', () => {
-            isDragging = false;
-        });
-
-        // Handle touch events for dragging
-        canvasEl.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startPanX = e.touches[0].clientX - panX;
-                startPanY = e.touches[0].clientY - panY;
-            }
-        });
-
-        canvasEl.addEventListener('touchmove', (e) => {
-            if (isDragging && e.touches.length === 1) {
-                panX = e.touches[0].clientX - startPanX;
-                panY = e.touches[0].clientY - startPanY;
-                drawImage();
-            }
-        });
-
-        canvasEl.addEventListener('touchend', () => {
-            isDragging = false;
-        });
-
-        // Handle Zoom with Mouse Wheel (Zoom at cursor point)
-        canvasEl.addEventListener('wheel', (e) => {
-            e.preventDefault();
-
-            const zoomFactor = 1.1;
-            const mouseX = e.offsetX;
-            const mouseY = e.offsetY;
-
-            // Calculate zoom point
-            const prevZoom = zoom;
-            if (e.deltaY < 0) {
-                zoom *= zoomFactor; // Zoom in
-            } else {
-                zoom /= zoomFactor; // Zoom out
-            }
-
-            // Clamp zoom levels
-            zoom = Math.min(maxZoom, Math.max(minZoom, zoom));
-
-            // Adjust panning to zoom towards cursor
-            const zoomDelta = zoom / prevZoom;
-            panX -= (mouseX - panX) * (zoomDelta - 1);
-            panY -= (mouseY - panY) * (zoomDelta - 1);
-
-            drawImage();
-        });
-
-        // Close canvas when clicking outside
-        canvasEl.addEventListener('click', (e) => {
-            if (e.target === canvasEl) {
-                canvasEl.style.display = 'none';
-            }
-        });
-
-        // Image Click Event to Trigger Zoom and Pan
-        document.querySelectorAll('.calendar-img').forEach((imgElement) => {
-            imgElement.addEventListener('click', () => {
-                loadImage(imgElement.src).then((img) => {
-                    image = img;
-                    zoom = 1;
-                    panX = 0;
-                    panY = 0;
-                    resizeCanvas();
-                    drawImage();
-                    canvasEl.style.display = 'block';
-                });
-            });
-        });
-
-        // Handle window resize
-        window.addEventListener('resize', () => {
-            if (image) {
-                resizeCanvas();
-                drawImage();
-            }
-        });
-
-    </script>
-
-</body>
-</html> -->
-<!-- {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoomable Image</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        .image-container {
-            position: relative;
-            overflow: hidden;
-            width: 90vw; /* 90% of the viewport width */
-            height: 80vh; /* 80% of the viewport height */
-            border: 2px solid #ddd; /* Optional border to show the container */
-        }
-
-        canvas {
-            display: block;
-            touch-action: none; /* Disable default touch actions */
-            transition: transform 0.3s ease;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="image-container" id="image-container">
-        <canvas id="zoomable-canvas"></canvas>
-    </div>
-
-    <script>
-        // Setup for zooming functionality
-        var canvas = document.getElementById('zoomable-canvas');
-        var ctx = canvas.getContext('2d');
-        var image = new Image();
-        var originalWidth, originalHeight;
-        var scale = 1;
-        var lastPinchDistance = 0;
-        var pinchCenterX = 0;
-        var pinchCenterY = 0;
-        var lastTouchX = 0;
-        var lastTouchY = 0;
-
-        // Load image
-        image.onload = function() {
-            originalWidth = image.width;
-            originalHeight = image.height;
-
-            // Scale image to fit within the container without going out of bounds
-            var container = document.getElementById('image-container');
-            var maxWidth = container.offsetWidth;
-            var maxHeight = container.offsetHeight;
-
-            // Calculate the scaling factor to fit the image inside the container
-            var scaleX = maxWidth / originalWidth;
-            var scaleY = maxHeight / originalHeight;
-            var scale = Math.min(scaleX, scaleY);
-
-            // Set canvas size based on the scaled image dimensions
-            canvas.width = originalWidth * scale;
-            canvas.height = originalHeight * scale;
-
-            // Draw image on canvas
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            centerCanvasVertically(container);
-        };
-
-        // Set image source
-        image.src = 'https://drishtis.app/HMA_Calendar/static/images/Nov.jpeg';  // Replace with your image URL
-
-        // Pinch-to-zoom
-        canvas.addEventListener('touchstart', function(event) {
-            if (event.touches.length === 2) {
-                var touch1 = event.touches[0];
-                var touch2 = event.touches[1];
-                pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
-                pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
-                lastPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            } else if (event.touches.length === 1) {
-                var touch = event.touches[0];
-                lastTouchX = touch.clientX;
-                lastTouchY = touch.clientY;
-            }
-        });
-
-        // Handle touchmove for zooming and panning
-        canvas.addEventListener('touchmove', function(event) {
-            event.preventDefault();
-            if (event.touches.length === 2) {
-                var touch1 = event.touches[0];
-                var touch2 = event.touches[1];
-                var newPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-                var deltaScale = newPinchDistance / lastPinchDistance;
-                var newWidth = originalWidth * scale * deltaScale;
-                var newHeight = originalHeight * scale * deltaScale;
-
-                if (newWidth > canvas.width && newHeight > canvas.height) {
-                    var deltaX = (pinchCenterX - canvas.offsetLeft) * (1 - deltaScale);
-                    var deltaY = (pinchCenterY - canvas.offsetTop) * (1 - deltaScale);
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.translate(deltaX, deltaY);
-                    ctx.scale(deltaScale, deltaScale);
-                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                    scale *= deltaScale;
-                    lastPinchDistance = newPinchDistance;
-                }
-            } else if (event.touches.length === 1) {
-                var touch = event.touches[0];
-                var deltaX = touch.clientX - lastTouchX;
-                var deltaY = touch.clientY - lastTouchY;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.translate(deltaX, deltaY);
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                lastTouchX = touch.clientX;
-                lastTouchY = touch.clientY;
-            }
-        });
-
-        // Center canvas vertically inside the container
-        function centerCanvasVertically(container) {
-            var windowHeight = window.innerHeight;
-            var containerHeight = container.offsetHeight;
-            var marginTop = (windowHeight - containerHeight) / 2;
-            container.style.marginTop = marginTop + 'px';
-        }
-    </script>
-
-</body>
-</html> -->
-
-<!-- {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zoomable Image</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
-        }
-
-        .image-container {
-            position: relative;
-            overflow: hidden;
-            width: 90vw; /* 90% of the viewport width */
-            height: 80vh; /* 80% of the viewport height */
-            border: 2px solid #ddd; /* Optional border to show the container */
-        }
-
-        canvas {
-            display: block;
-            touch-action: none; /* Disable default touch actions */
-            transition: transform 0.3s ease;
-        }
-    </style>
-</head>
-<body>
-
-    <div class="image-container" id="image-container">
-        <canvas id="zoomable-canvas"></canvas>
-    </div>
-
-    <script>
-        // Setup for zooming functionality
-        var canvas = document.getElementById('zoomable-canvas');
-        var ctx = canvas.getContext('2d');
-        var image = new Image();
-        var originalWidth, originalHeight;
-        var scale = 1;
-        var lastPinchDistance = 0;
-        var pinchCenterX = 0;
-        var pinchCenterY = 0;
-        var lastTouchX = 0;
-        var lastTouchY = 0;
-        var isImageReset = true;
-
-        // Load image
-        image.onload = function() {
-            originalWidth = image.width;
-            originalHeight = image.height;
-
-            // Set canvas size based on the image size and the container size
-            resizeCanvas();
-            ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-        };
-
-        // Set image source
-        image.src = 'https://drishtis.app/HMA_Calendar/static/images/Nov.jpeg';  // Replace with your image URL
-
-        // Resize canvas according to the container size to keep the image visible
-        function resizeCanvas() {
-            var containerWidth = document.getElementById('image-container').offsetWidth;
-            var containerHeight = document.getElementById('image-container').offsetHeight;
-
-            // Maintain aspect ratio of the image
-            var canvasWidth = containerWidth;
-            var canvasHeight = (originalHeight / originalWidth) * canvasWidth;
-
-            if (canvasHeight > containerHeight) {
-                canvasHeight = containerHeight;
-                canvasWidth = (originalWidth / originalHeight) * canvasHeight;
-            }
-
-            // Set canvas size to match the container size
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-        }
-
-        // Pinch-to-zoom
-        canvas.addEventListener('touchstart', function(event) {
-            if (event.touches.length === 2) {
-                var touch1 = event.touches[0];
-                var touch2 = event.touches[1];
-                pinchCenterX = (touch1.clientX + touch2.clientX) / 2;
-                pinchCenterY = (touch1.clientY + touch2.clientY) / 2;
-                lastPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-            } else if (event.touches.length === 1) {
-                var touch = event.touches[0];
-                lastTouchX = touch.clientX;
-                lastTouchY = touch.clientY;
-            }
-        });
-
-        // Handle touchmove for zooming and panning
-        canvas.addEventListener('touchmove', function(event) {
-            event.preventDefault();
-            if (event.touches.length === 2) {
-                var touch1 = event.touches[0];
-                var touch2 = event.touches[1];
-                var newPinchDistance = Math.hypot(touch1.clientX - touch2.clientX, touch1.clientY - touch2.clientY);
-                var deltaScale = newPinchDistance / lastPinchDistance;
-
-                // Restrict zooming in and out to prevent the image from becoming invisible or too large
-                var newWidth = originalWidth * scale * deltaScale;
-                var newHeight = originalHeight * scale * deltaScale;
-
-                // Set boundaries to prevent image from going invisible or too large
-                if (newWidth >= originalWidth && newHeight >= originalHeight && newWidth <= originalWidth * 3 && newHeight <= originalHeight * 3) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.scale(deltaScale, deltaScale);
-                    ctx.drawImage(image, 0, 0, newWidth, newHeight);
-                    scale *= deltaScale;
-                    lastPinchDistance = newPinchDistance;
-                }
-            } else if (event.touches.length === 1) {
-                var touch = event.touches[0];
-                var deltaX = touch.clientX - lastTouchX;
-                var deltaY = touch.clientY - lastTouchY;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.translate(deltaX, deltaY);
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                lastTouchX = touch.clientX;
-                lastTouchY = touch.clientY;
-            }
-        });
-
-        // Single tap to reset image size to original
-        canvas.addEventListener('click', function(event) {
-            if (!isImageReset) {
-                // Reset the image to its original size
-                scale = 1;  // Reset the scale
-                resizeCanvas();
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                isImageReset = true; // Image has been reset
-            }
-        });
-
-    </script>
-
-</body>
-</html> -->
 {% load static %}
 {% load pwa %}
 <!DOCTYPE html>
@@ -642,6 +17,11 @@
             padding: 0;
             box-sizing: border-box;
         }
+        body {
+            overscroll-behavior: none;
+            touch-action: pan-x pan-y;
+        }
+
 
         body {
             font-family: Arial, sans-serif;
@@ -713,7 +93,7 @@
             gap: 15px;
         }
 
-        .calendar-img {
+        /* .calendar-img {
             width: auto;
             max-width: 90vw;
             height: 75vh;
@@ -721,6 +101,16 @@
             cursor: pointer;
             border-radius: 10px;
             transition: transform 0.3s ease-in-out;
+        } */
+        /* Calendar Image Styling */
+        .calendar-img {
+            width: 100%;
+            max-width: 90vw; /* Responsive constraint */
+            height: auto; /* Maintain aspect ratio */
+            max-height: 75vh; /* Prevent excessive height on large screens */
+            object-fit: cover; /* Ensure proper scaling */
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
         }
 
         /* .calendar-img.zoomed {
@@ -813,9 +203,6 @@
             transition: transform 0.3s ease-in-out;
             transform-origin: center center;
         } */
-
-
-
     </style>
 </head>
 <body>
@@ -876,14 +263,14 @@
     </div>
 </div>
     <script>
+        // ======= Global Variables =======
         const toggleIcon = document.getElementById('toggle-icon');
         const frontSlider = document.getElementById('calendar-slider-front');
         const backSlider = document.getElementById('calendar-slider-back');
         const images = document.querySelectorAll('.calendar-img');
+        let currentMonth = new Date().getMonth() + 1;
 
-        // Smoothly scroll to the current month on page load with preloading
-        const currentMonth = new Date().getMonth() + 1;
-
+        // ======= Smooth Scroll to Current Month =======
         const scrollToCurrentMonth = (slider) => {
             const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
             if (monthImg) {
@@ -895,171 +282,256 @@
             }
         };
 
-        // Ensure images are loaded before scrolling
+        // ======= Preload Images =======
         const preloadImages = (slider, callback) => {
-            const images = slider.querySelectorAll('.calendar-img');
+            const sliderImages = slider.querySelectorAll('.calendar-img');
             let loadedCount = 0;
 
-            images.forEach(img => {
+            sliderImages.forEach(img => {
                 if (img.complete) {
                     loadedCount++;
                 } else {
                     img.onload = () => {
                         loadedCount++;
-                        if (loadedCount === images.length) {
-                            callback();
-                        }
+                        if (loadedCount === sliderImages.length) callback();
                     };
                     img.onerror = () => {
                         console.warn(`Failed to load image: ${img.src}`);
                         loadedCount++;
-                        if (loadedCount === images.length) {
-                            callback();
-                        }
+                        if (loadedCount === sliderImages.length) callback();
                     };
                 }
             });
 
-            if (loadedCount === images.length) {
-                callback();
-            }
+            if (loadedCount === sliderImages.length) callback();
         };
 
-        // Preload both sliders and ensure proper scrolling
-        preloadImages(frontSlider, () => scrollToCurrentMonth(frontSlider));
-        preloadImages(backSlider, () => scrollToCurrentMonth(backSlider));
+        // ======= Handle Initial Load =======
+        window.addEventListener('load', () => {
+            preloadImages(frontSlider, () => scrollToCurrentMonth(frontSlider));
+            preloadImages(backSlider, () => scrollToCurrentMonth(backSlider));
+            images.forEach(img => {
+                img.style.height = img.naturalHeight + 'px';
+            });
+        });
 
-        // Three dot menu toggle
+        // ======= Three-dot Menu Toggle =======
         document.getElementById('three-dot-menu').addEventListener('click', () => {
             const aboutUsText = document.getElementById('about-us-text');
-            aboutUsText.style.display = aboutUsText.style.display === 'none' || aboutUsText.style.display === '' ? 'block' : 'none';
+            aboutUsText.style.display = (aboutUsText.style.display === 'none' || aboutUsText.style.display === '') 
+                ? 'block' : 'none';
         });
 
-        // Hide "About Us" and reset when the link is clicked
         document.getElementById('about-us-text').addEventListener('click', () => {
-            const aboutUsText = document.getElementById('about-us-text');
-            aboutUsText.style.display = 'none';  // Hide the About Us text
+            document.getElementById('about-us-text').style.display = 'none';
         });
 
-        // Detect visible month
+        // ======= Detect Visible Month =======
         const getVisibleMonth = (slider) => {
             const sliderRect = slider.getBoundingClientRect();
             for (let img of slider.querySelectorAll('.calendar-img')) {
                 const imgRect = img.getBoundingClientRect();
-                if (
-                    imgRect.left >= sliderRect.left &&
-                    imgRect.right <= sliderRect.right
-                ) {
+                if (imgRect.left >= sliderRect.left && imgRect.right <= sliderRect.right) {
                     return img.getAttribute('data-month');
                 }
             }
             return currentMonth;
         };
 
-        // Toggle functionality with smooth transitions
+        // ======= Slider Toggle with Smooth Transition =======
         toggleIcon.addEventListener('click', () => {
             const activeSlider = frontSlider.style.display === 'none' ? backSlider : frontSlider;
             const inactiveSlider = frontSlider.style.display === 'none' ? frontSlider : backSlider;
-
-            // Get the currently visible month on the active slider
             const visibleMonth = getVisibleMonth(activeSlider);
 
-            // Hide active slider and prepare inactive slider
             activeSlider.style.opacity = '0';
             activeSlider.style.transition = 'opacity 0.3s ease-in-out';
 
             setTimeout(() => {
                 activeSlider.style.display = 'none';
                 inactiveSlider.style.display = 'flex';
-                
-                // Scroll to the corresponding month on the new slider
                 preloadImages(inactiveSlider, () => {
                     const monthImg = inactiveSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
                     if (monthImg) {
                         inactiveSlider.style.scrollBehavior = 'auto';
                         monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
-                        setTimeout(() => {
-                            inactiveSlider.style.scrollBehavior = 'smooth';
-                        }, 100);
+                        setTimeout(() => inactiveSlider.style.scrollBehavior = 'smooth', 100);
                     }
 
                     inactiveSlider.style.opacity = '1';
                     inactiveSlider.style.transition = 'opacity 0.3s ease-in-out';
                 });
             }, 300);
-
-            
         });
 
-    </script>
-    <script>
-        const Images = document.querySelectorAll('.calendar-img');
-        let scale = 1;
-        let initialDistance = 0;
-    
-        Images.forEach(img => {
-            let initialDistance = 0;
-            let initialScale = 1;
-            let initialTouch1 = null;
-            let initialTouch2 = null;
-            let minScale = 1; // Minimum zoom level (default size)
-            let maxScale = 4; // Maximum zoom level (you can adjust this as needed)
-    
-            // Start touch event for pinching
+        // ======= Pinch-to-Zoom =======
+        // images.forEach(img => {
+        //     let initialDistance = 0;
+        //     let initialScale = 1;
+        //     let initialTouch1 = null;
+        //     let initialTouch2 = null;
+        //     const minScale = 1;
+        //     const maxScale = 4;
+
+        //     img.addEventListener('touchstart', (e) => {
+        //         if (e.touches.length === 2) {
+        //             initialTouch1 = e.touches[0];
+        //             initialTouch2 = e.touches[1];
+        //             initialDistance = Math.sqrt(
+        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
+        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
+        //             );
+        //             initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
+        //             e.preventDefault();
+        //         }
+        //     });
+
+        //     img.addEventListener('touchmove', (e) => {
+        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
+        //             const touch1 = e.touches[0];
+        //             const touch2 = e.touches[1];
+        //             const distance = Math.sqrt(
+        //                 (touch1.pageX - touch2.pageX) ** 2 + 
+        //                 (touch1.pageY - touch2.pageY) ** 2
+        //             );
+        //             let scale = initialScale * (distance / initialDistance);
+        //             scale = Math.max(minScale, Math.min(scale, maxScale));
+
+        //             img.style.transform = `scale(${scale})`;
+        //             img.style.transition = 'transform 0s';
+        //             img.style.transformOrigin = `${(touch1.pageX + touch2.pageX) / 2}px ${(touch1.pageY + touch2.pageY) / 2}px`;
+        //         }
+        //     });
+
+        //     img.addEventListener('touchend', () => {
+        //         initialTouch1 = null;
+        //         initialTouch2 = null;
+        //         img.style.transition = 'transform 0.3s ease';
+        //     });
+
+        //     img.addEventListener('click', () => {
+        //         img.style.transform = 'scale(1)';
+        //         img.style.transition = 'transform 0.3s ease';
+        //     });
+        // });
+        //======= Canvas-based Zoom Logic (for images) =======
+        images.forEach(img => {
+            let isZoomed = false;
+            let startX = 0, startY = 0;
+            let scale = 1;
+            let currentScale = 1;
+            let lastDistance = 0;
+            let pinchStartDistance = 0;
+            let pinchStartScale = 1;
+
+            const minScale = 1;
+            const maxScale = 4;
+
+            // Create a hidden canvas to manage zoom
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            document.body.appendChild(canvas);
+            canvas.style.display = 'none'; // Hide canvas
+
+            // Resize canvas to match the image dimensions
+            const resizeCanvas = () => {
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+            };
+
+            // Draw the image on canvas (after resizing)
+            const drawImageOnCanvas = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
+
+            // Zoom logic for touchstart (handle pinch)
             img.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
-                    initialTouch1 = e.touches[0];
-                    initialTouch2 = e.touches[1];
-                    initialDistance = Math.sqrt(
-                        (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-                        (initialTouch1.pageY - initialTouch2.pageY) ** 2
+                    pinchStartDistance = Math.hypot(
+                        e.touches[0].pageX - e.touches[1].pageX,
+                        e.touches[0].pageY - e.touches[1].pageY
                     );
-                    initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                    e.preventDefault(); // Prevent scrolling on touch
+                    pinchStartScale = currentScale;
+                    e.preventDefault();
                 }
             });
-    
-            // Pinch zooming during touchmove
+
+            // Handle pinch zoom on touchmove
             img.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
+                if (e.touches.length === 2) {
                     const touch1 = e.touches[0];
                     const touch2 = e.touches[1];
-                    const distance = Math.sqrt(
-                        (touch1.pageX - touch2.pageX) ** 2 + 
-                        (touch1.pageY - touch2.pageY) ** 2
+                    const distance = Math.hypot(
+                        touch1.pageX - touch2.pageX,
+                        touch1.pageY - touch2.pageY
                     );
-                    let scale = initialScale * (distance / initialDistance); // Calculate the new scale
-    
+
+                    let scaleDelta = distance / pinchStartDistance;
+                    scale = pinchStartScale * scaleDelta;
+
                     // Limit the scale between minScale and maxScale
                     scale = Math.max(minScale, Math.min(scale, maxScale));
-    
-                    // Set the zoom scale
-                    img.style.transform = `scale(${scale})`;
-                    img.style.transition = 'transform 0s';  // Disable transition during pinch
-    
-                    // Adjust the zoom origin to the midpoint of the two touch points
-                    const zoomCenterX = (touch1.pageX + touch2.pageX) / 2;
-                    const zoomCenterY = (touch1.pageY + touch2.pageY) / 2;
-                    img.style.transformOrigin = `${zoomCenterX}px ${zoomCenterY}px`;
+
+                    // Calculate the midpoint of the pinch
+                    const pinchCenterX = (touch1.pageX + touch2.pageX) / 2;
+                    const pinchCenterY = (touch1.pageY + touch2.pageY) / 2;
+
+                    // Adjust the transform origin to the pinch center (this moves the zoom point)
+                    img.style.transformOrigin = `${pinchCenterX}px ${pinchCenterY}px`;
+
+                    if (scale !== currentScale) {
+                        currentScale = scale;
+                        img.style.transform = `scale(${scale})`;
+                        img.style.transition = 'transform 0s'; // Instant transformation during touchmove
+                    }
                 }
             });
-    
-            // End touch event for zoom
-            img.addEventListener('touchend', () => {
-                initialTouch1 = null;
-                initialTouch2 = null;
-                initialDistance = 0;
-                initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                img.style.transition = 'transform 0.3s ease';  // Smooth transition after zoom
 
+            // Zoom reset on touchend (single tap)
+            img.addEventListener('touchend', () => {
+                if (currentScale !== 1) {
+                    img.style.transform = 'scale(1)';
+                    img.style.transition = 'transform 0.3s ease';
+                    currentScale = 1;
+                }
             });
-    
-            // Single Tap to Reset Zoom (Added from the first script)
-            img.addEventListener('click', () => {
-                img.style.transform = 'scale(1)';
-                img.style.transition = 'transform 0.3s ease';
+
+            // Use canvas to draw the image when zoomed (instead of directly scaling the image)
+            img.addEventListener('touchstart', () => {
+                resizeCanvas();
+                drawImageOnCanvas();
+            });
+
+            img.addEventListener('touchmove', (e) => {
+                // Calculate the pinch zoom based on the current pinch distance
+                if (e.touches.length === 2) {
+                    const touch1 = e.touches[0];
+                    const touch2 = e.touches[1];
+                    const distance = Math.hypot(
+                        touch1.pageX - touch2.pageX,
+                        touch1.pageY - touch2.pageY
+                    );
+
+                    // Recalculate the scale based on the new distance
+                    let scaleDelta = distance / pinchStartDistance;
+                    scale = pinchStartScale * scaleDelta;
+
+                    // Clamp scale to within bounds
+                    scale = Math.max(minScale, Math.min(scale, maxScale));
+
+                    // Calculate the pinch center (midpoint of the touch points)
+                    const pinchCenterX = (touch1.pageX + touch2.pageX) / 2;
+                    const pinchCenterY = (touch1.pageY + touch2.pageY) / 2;
+
+                    // Set the transform origin to the pinch center (for dynamic zooming)
+                    img.style.transformOrigin = `${pinchCenterX}px ${pinchCenterY}px`;
+                    img.style.transform = `scale(${scale})`;
+                    img.style.transition = 'transform 0s'; // No transition while zooming
+                }
             });
         });
-    </script>  
+         
+    </script>
 </body>
 </html>
