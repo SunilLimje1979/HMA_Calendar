@@ -67,7 +67,7 @@
         const appContainer = document.querySelector("#app-container");
 
         // URL to redirect after the app is installed
-        const redirectUrl = "/HMA_Calendar/calendar/";
+        const redirectUrl = "/cal2025/calendar/";
 
         // Debugging message to check the standalone mode
         console.log("Checking if app is installed: ", window.matchMedia('(display-mode: standalone)').matches);
@@ -281,7 +281,7 @@
     <script>
         let installPrompt = null;
         const installButton = document.querySelector("#install");
-        const redirectUrl = "/HMA_Calendar/calendar/";
+        const redirectUrl = "/cal2025/calendar/";
 
         /**
          * Check if the app is running in standalone mode or already installed
@@ -353,7 +353,7 @@
         const iosModal = document.getElementById("ios-install-modal");
         const showModalBtn = document.getElementById("show-ios-install-modal");
         const closeModalBtn = iosModal.querySelector(".close-btn");
-        {% comment %} const redirectUrl = "/HMA_Calendar/calendar/"; {% endcomment %}
+        {% comment %} const redirectUrl = "/cal2025/calendar/"; {% endcomment %}
 
         function isIos() {
             return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
