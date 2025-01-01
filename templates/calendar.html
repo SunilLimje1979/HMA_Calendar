@@ -553,7 +553,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/cal2025/staticfiles/js/serviceworker.js')
+                navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
                     .then((reg) => {
                         console.log('Service Worker registered:', reg);
                     })
