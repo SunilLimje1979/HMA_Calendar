@@ -263,192 +263,7 @@
         <img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img">
     </div>
 </div>
-    <!-- <script>
-        const toggleIcon = document.getElementById('toggle-icon');
-        const frontSlider = document.getElementById('calendar-slider-front');
-        const backSlider = document.getElementById('calendar-slider-back');
-        const images = document.querySelectorAll('.calendar-img');
-
-        // Smoothly scroll to the current month on page load with preloading
-        const currentMonth = new Date().getMonth() + 1;
-
-        const scrollToCurrentMonth = (slider) => {
-            const monthImg = slider.querySelector(`.calendar-img[data-month='${currentMonth}']`);
-            if (monthImg) {
-                slider.style.scrollBehavior = 'auto'; // Disable smooth scroll initially
-                monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
-                setTimeout(() => {
-                    slider.style.scrollBehavior = 'smooth'; // Re-enable smooth scroll
-                }, 100); 
-            }
-        };
-
-        // Ensure images are loaded before scrolling
-        const preloadImages = (slider, callback) => {
-            const images = slider.querySelectorAll('.calendar-img');
-            let loadedCount = 0;
-
-            images.forEach(img => {
-                if (img.complete) {
-                    loadedCount++;
-                } else {
-                    img.onload = () => {
-                        loadedCount++;
-                        if (loadedCount === images.length) {
-                            callback();
-                        }
-                    };
-                    img.onerror = () => {
-                        console.warn(`Failed to load image: ${img.src}`);
-                        loadedCount++;
-                        if (loadedCount === images.length) {
-                            callback();
-                        }
-                    };
-                }
-            });
-
-            if (loadedCount === images.length) {
-                callback();
-            }
-        };
-
-        // Preload both sliders and ensure proper scrolling
-        preloadImages(frontSlider, () => scrollToCurrentMonth(frontSlider));
-        preloadImages(backSlider, () => scrollToCurrentMonth(backSlider));
-
-        // Three dot menu toggle
-        document.getElementById('three-dot-menu').addEventListener('click', () => {
-            const aboutUsText = document.getElementById('about-us-text');
-            aboutUsText.style.display = aboutUsText.style.display === 'none' || aboutUsText.style.display === '' ? 'block' : 'none';
-        });
-
-        // Hide "About Us" and reset when the link is clicked
-        document.getElementById('about-us-text').addEventListener('click', () => {
-            const aboutUsText = document.getElementById('about-us-text');
-            aboutUsText.style.display = 'none';  // Hide the About Us text
-        });
-
-        // Detect visible month
-        const getVisibleMonth = (slider) => {
-            const sliderRect = slider.getBoundingClientRect();
-            for (let img of slider.querySelectorAll('.calendar-img')) {
-                const imgRect = img.getBoundingClientRect();
-                if (
-                    imgRect.left >= sliderRect.left &&
-                    imgRect.right <= sliderRect.right
-                ) {
-                    return img.getAttribute('data-month');
-                }
-            }
-            return currentMonth;
-        };
-
-        // Toggle functionality with smooth transitions
-        toggleIcon.addEventListener('click', () => {
-            const activeSlider = frontSlider.style.display === 'none' ? backSlider : frontSlider;
-            const inactiveSlider = frontSlider.style.display === 'none' ? frontSlider : backSlider;
-
-            // Get the currently visible month on the active slider
-            const visibleMonth = getVisibleMonth(activeSlider);
-
-            // Hide active slider and prepare inactive slider
-            activeSlider.style.opacity = '0';
-            activeSlider.style.transition = 'opacity 0.3s ease-in-out';
-
-            setTimeout(() => {
-                activeSlider.style.display = 'none';
-                inactiveSlider.style.display = 'flex';
-                
-                // Scroll to the corresponding month on the new slider
-                preloadImages(inactiveSlider, () => {
-                    const monthImg = inactiveSlider.querySelector(`.calendar-img[data-month='${visibleMonth}']`);
-                    if (monthImg) {
-                        inactiveSlider.style.scrollBehavior = 'auto';
-                        monthImg.scrollIntoView({ block: 'nearest', inline: 'center' });
-                        setTimeout(() => {
-                            inactiveSlider.style.scrollBehavior = 'smooth';
-                        }, 100);
-                    }
-
-                    inactiveSlider.style.opacity = '1';
-                    inactiveSlider.style.transition = 'opacity 0.3s ease-in-out';
-                });
-            }, 300);
-
-            
-        });
-
-    </script>
-    <script>
-        const Images = document.querySelectorAll('.calendar-img');
-        let scale = 1;
-        let initialDistance = 0;
     
-        Images.forEach(img => {
-            let initialDistance = 0;
-            let initialScale = 1;
-            let initialTouch1 = null;
-            let initialTouch2 = null;
-            let minScale = 1; // Minimum zoom level (default size)
-            let maxScale = 4; // Maximum zoom level (you can adjust this as needed)
-    
-            // Start touch event for pinching
-            img.addEventListener('touchstart', (e) => {
-                if (e.touches.length === 2) {
-                    initialTouch1 = e.touches[0];
-                    initialTouch2 = e.touches[1];
-                    initialDistance = Math.sqrt(
-                        (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-                        (initialTouch1.pageY - initialTouch2.pageY) ** 2
-                    );
-                    initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                    e.preventDefault(); // Prevent scrolling on touch
-                }
-            });
-    
-            // Pinch zooming during touchmove
-            img.addEventListener('touchmove', (e) => {
-                if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
-                    const touch1 = e.touches[0];
-                    const touch2 = e.touches[1];
-                    const distance = Math.sqrt(
-                        (touch1.pageX - touch2.pageX) ** 2 + 
-                        (touch1.pageY - touch2.pageY) ** 2
-                    );
-                    let scale = initialScale * (distance / initialDistance); // Calculate the new scale
-    
-                    // Limit the scale between minScale and maxScale
-                    scale = Math.max(minScale, Math.min(scale, maxScale));
-    
-                    // Set the zoom scale
-                    img.style.transform = `scale(${scale})`;
-                    img.style.transition = 'transform 0s';  // Disable transition during pinch
-    
-                    // Adjust the zoom origin to the midpoint of the two touch points
-                    const zoomCenterX = (touch1.pageX + touch2.pageX) / 2;
-                    const zoomCenterY = (touch1.pageY + touch2.pageY) / 2;
-                    img.style.transformOrigin = `${zoomCenterX}px ${zoomCenterY}px`;
-                }
-            });
-    
-            // End touch event for zoom
-            img.addEventListener('touchend', () => {
-                initialTouch1 = null;
-                initialTouch2 = null;
-                initialDistance = 0;
-                initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
-                img.style.transition = 'transform 0.3s ease';  // Smooth transition after zoom
-
-            });
-    
-            // Single Tap to Reset Zoom (Added from the first script)
-            img.addEventListener('click', () => {
-                img.style.transform = 'scale(1)';
-                img.style.transition = 'transform 0.3s ease';
-            });
-        });
-    </script>   -->
     <script>
         // ======= Global Variables =======
         const toggleIcon = document.getElementById('toggle-icon');
@@ -552,13 +367,91 @@
         });
 
         // ======= Pinch-to-Zoom =======
+        // images.forEach(img => {
+        //     let initialDistance = 0;
+        //     let initialScale = 1;
+        //     let initialTouch1 = null;
+        //     let initialTouch2 = null;
+        //     const minScale = 1;
+        //     const maxScale = 4;
+
+        //     img.addEventListener('touchstart', (e) => {
+        //         if (e.touches.length === 2) {
+        //             initialTouch1 = e.touches[0];
+        //             initialTouch2 = e.touches[1];
+        //             initialDistance = Math.sqrt(
+        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
+        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
+        //             );
+        //             initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
+        //             e.preventDefault();
+        //         }
+        //     });
+
+        //     img.addEventListener('touchmove', (e) => {
+        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
+        //             const touch1 = e.touches[0];
+        //             const touch2 = e.touches[1];
+        //             const distance = Math.sqrt(
+        //                 (touch1.pageX - touch2.pageX) ** 2 + 
+        //                 (touch1.pageY - touch2.pageY) ** 2
+        //             );
+        //             let scale = initialScale * (distance / initialDistance);
+        //             scale = Math.max(minScale, Math.min(scale, maxScale));
+
+        //             img.style.transform = `scale(${scale})`;
+        //             img.style.transition = 'transform 0s';
+        //             img.style.transformOrigin = `${(touch1.pageX + touch2.pageX) / 2}px ${(touch1.pageY + touch2.pageY) / 2}px`;
+        //         }
+        //     });
+
+        //     img.addEventListener('touchend', () => {
+        //         initialTouch1 = null;
+        //         initialTouch2 = null;
+        //         img.style.transition = 'transform 0.3s ease';
+        //     });
+
+        //     img.addEventListener('click', () => {
+        //         img.style.transform = 'scale(1)';
+        //         img.style.transition = 'transform 0.3s ease';
+        //     });
+        // });
         images.forEach(img => {
             let initialDistance = 0;
             let initialScale = 1;
             let initialTouch1 = null;
             let initialTouch2 = null;
+            let currentScale = 1;
+            let isPanning = false;
+            let startX = 0;
+            let startY = 0;
+            let offsetX = 0;
+            let offsetY = 0;
+            let lastOffsetX = 0;
+            let lastOffsetY = 0;
+            let tapStartTime = 0;
+            let tapTimeout = null;
             const minScale = 1;
             const maxScale = 4;
+
+            // Speed factor to slow down the panning when zoomed in
+            const panSpeedFactor = 0.5; // Adjust this value to control the pan speed
+
+            const slider = document.querySelector('.calendar-slider'); // Replace with your actual slider class or ID
+
+            const disableScrolling = () => {
+                document.body.style.overflow = 'hidden';
+                if (slider) {
+                    slider.style.overflow = 'hidden';
+                }
+            };
+
+            const enableScrolling = () => {
+                document.body.style.overflow = '';
+                if (slider) {
+                    slider.style.overflow = '';
+                }
+            };
 
             img.addEventListener('touchstart', (e) => {
                 if (e.touches.length === 2) {
@@ -568,9 +461,14 @@
                         (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
                         (initialTouch1.pageY - initialTouch2.pageY) ** 2
                     );
-                    initialScale = parseFloat(img.style.transform.replace('scale(', '').replace(')', '')) || 1;
+                    initialScale = currentScale;
                     e.preventDefault();
+                } else if (e.touches.length === 1 && currentScale > 1) {
+                    isPanning = true;
+                    startX = e.touches[0].pageX;
+                    startY = e.touches[0].pageY;
                 }
+                tapStartTime = new Date().getTime();
             });
 
             img.addEventListener('touchmove', (e) => {
@@ -583,24 +481,73 @@
                     );
                     let scale = initialScale * (distance / initialDistance);
                     scale = Math.max(minScale, Math.min(scale, maxScale));
+                    currentScale = scale;
 
-                    img.style.transform = `scale(${scale})`;
+                    img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
                     img.style.transition = 'transform 0s';
-                    img.style.transformOrigin = `${(touch1.pageX + touch2.pageX) / 2}px ${(touch1.pageY + touch2.pageY) / 2}px`;
+                    img.style.transformOrigin = 'center';
+
+                    if (currentScale > 1) {
+                        disableScrolling();
+                    } else {
+                        enableScrolling();
+                    }
+                } else if (isPanning && e.touches.length === 1) {
+                    const touch = e.touches[0];
+                    // Apply pan speed factor to slow down panning on zoomed-in image
+                    offsetX = lastOffsetX + (touch.pageX - startX) * panSpeedFactor;
+                    offsetY = lastOffsetY + (touch.pageY - startY) * panSpeedFactor;
+
+                    img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
+                    img.style.transition = 'transform 0s';
                 }
             });
 
-            img.addEventListener('touchend', () => {
+            img.addEventListener('touchend', (e) => {
+                if (isPanning) {
+                    lastOffsetX = offsetX;
+                    lastOffsetY = offsetY;
+                    isPanning = false;
+                }
+
                 initialTouch1 = null;
                 initialTouch2 = null;
                 img.style.transition = 'transform 0.3s ease';
+
+                const tapEndTime = new Date().getTime();
+                if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
+                    currentScale = 1;
+                    offsetX = 0;
+                    offsetY = 0;
+                    lastOffsetX = 0;
+                    lastOffsetY = 0;
+                    img.style.transform = 'scale(1) translate(0px, 0px)';
+                    img.style.transition = 'transform 0.3s ease';
+
+                    enableScrolling();
+                }
             });
 
+            let lastTap = 0;
             img.addEventListener('click', () => {
-                img.style.transform = 'scale(1)';
-                img.style.transition = 'transform 0.3s ease';
+                let currentTime = new Date().getTime();
+                if (currentTime - lastTap < 300) {
+                    currentScale = 1;
+                    offsetX = 0;
+                    offsetY = 0;
+                    lastOffsetX = 0;
+                    lastOffsetY = 0;
+                    img.style.transform = 'scale(1) translate(0px, 0px)';
+                    img.style.transition = 'transform 0.3s ease';
+
+                    enableScrolling();
+                }
+                lastTap = currentTime;
             });
         });
+
+
+
 
     </script>
 </body>
