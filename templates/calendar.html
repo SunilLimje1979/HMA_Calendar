@@ -550,7 +550,7 @@
 
 
     </script>
-    <!-- <script>
+    <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
@@ -562,22 +562,8 @@
                     });
             });
         }
-    </script> -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js', {
-                    scope: '/cal2025/'  // This will cover everything under /cal2025/
-                })
-                .then((reg) => {
-                    console.log('Service Worker registered with scope:', reg.scope);
-                })
-                .catch((err) => {
-                    console.error('Service Worker registration failed:', err);
-                });
-            });
-        }
     </script>
+
     
 </body>
 </html>
