@@ -17,11 +17,6 @@
             padding: 0;
             box-sizing: border-box;
         }
-        body {
-            overscroll-behavior: none;
-            touch-action: pan-x pan-y;
-        }
-
 
         body {
             font-family: Arial, sans-serif;
@@ -92,16 +87,7 @@
             display: flex;
             gap: 15px;
         }
-
-        /* .calendar-img {
-            width: auto;
-            max-width: 90vw;
-            height: 75vh;
-            object-fit: cover;
-            cursor: pointer;
-            border-radius: 10px;
-            transition: transform 0.3s ease-in-out;
-        } */
+ 
         /* Calendar Image Styling */
         .calendar-img {
             width: 100%;
@@ -113,11 +99,6 @@
             transition: transform 0.3s ease-in-out, height 0.3s ease-in-out;
         }
 
-        /* .calendar-img.zoomed {
-            transform: scale(2);
-            z-index: 999;
-            position: relative;
-        } */
         /* Toggle Button Icon Styling */
         .toggle-icon {
             position: fixed;
@@ -197,21 +178,77 @@
             transform-origin: center center; /* Default zoom center */
         }
 
-        /* Optional zoomed class for managing zoom on click */
-        /* .zoomed {
-            transform: scale(2);
-            transition: transform 0.3s ease-in-out;
-            transform-origin: center center;
-        } */
+        /* === Tablet/iPad View (768px - 1024px) === */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .calendar-slider {
+                display: flex;
+                overflow-x: auto; /* Enable horizontal scrolling */
+                scroll-snap-type: x mandatory; /* Snap to each image */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                gap: 0; /* Remove gaps between images */
+                scroll-behavior: smooth; /* Ensure smooth transition */
+            }
+
+            .calendar-img-container {
+                display: flex;
+                flex-direction: row; /* Horizontal layout */
+            }
+
+            .calendar-img {
+                flex: 0 0 100%; /* Each image takes full width of the viewport */
+                width: 100vw; /* Full screen width */
+                height: auto; /* Adjust height automatically */
+                max-height: 90vh; /* Ensure it doesn’t overflow vertically */
+                object-fit: contain; /* Ensure the whole image fits in the viewport */
+                scroll-snap-align: start; /* Snap each image properly */
+                transition: transform 0.3s ease-in-out;
+            }
+
+            /* Ensure smooth scrolling */
+            .calendar-slider::-webkit-scrollbar {
+                display: none; /* Hide scrollbar on iOS and Chrome */
+            }
+
+            .calendar-slider {
+                scrollbar-width: none; /* Hide scrollbar on Firefox */
+                overscroll-behavior-x: contain; /* Prevent bounce effect */
+            }
+
+            /* Toggle Button Icon Styling for Tablets */
+            .toggle-icon {
+                width: 80px; /* Slightly larger size */
+                height: 80px;
+                bottom: 50px; /* Adjust positioning */
+                right: 40px;
+            }
+
+            .toggle-icon img.icon-img {
+                width: 70%;
+                height: 70%;
+            }
+
+        }
+
+        /* === Larger Screens (1025px and above, Laptop & iPad Pro) === */
+        @media (min-width: 1025px) {
+            .calendar-slider {
+                justify-content: flex-start;  /* Align images to the left for larger screens */
+            }
+
+            .calendar-img {
+                width: 80%;  /* Adjust image width to fit larger screens */
+            }
+        }
+
     </style>
 </head>
 <body>
     <nav class="navbar fixed-top shadow-sm bg-white px-3 d-flex justify-content-between align-items-center" style="background-color:#005ba6;">
-        
+        <!-- Logo -->
         <div class="navbar-brand">
             <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" style="width: 80px; height: auto; border-radius: 5px;">
         </div>
-       
+        <!-- Three Dot Menu -->
         <div class="three-dot-menu" id="three-dot-menu">
             <i class="fas fa-ellipsis-v"></i>
         </div>
@@ -221,7 +258,7 @@
     </nav>
 
 <div class="calendar-container" style="margin-top: 70px;">
-   
+    <!-- Front Calendar Slider -->
     <div id="calendar-slider-front" class="calendar-slider">
         <div class="calendar-img-container">
             <img src="{% static 'images/January.jpeg' %}" class="calendar-img" data-month="1">
@@ -239,7 +276,7 @@
         </div>
     </div>
 
-    
+    <!-- Back Calendar Slider -->
     <div id="calendar-slider-back" class="calendar-slider" style="display: none;">
         <div class="calendar-img-container">
             <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img" data-month="1">
@@ -257,11 +294,12 @@
         </div>
     </div>
 
-   
+    <!-- Toggle Icon -->
     <div class="toggle-icon" id="toggle-icon">
         <img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img">
     </div>
 </div>
+    
     <script>
         // ======= Global Variables =======
         const toggleIcon = document.getElementById('toggle-icon');
@@ -364,7 +402,7 @@
             }, 300);
         });
 
-        //======= Pinch-to-Zoom =======
+        // ======= Pinch-to-Zoom =======
         // images.forEach(img => {
         //     let initialDistance = 0;
         //     let initialScale = 1;
@@ -414,361 +452,6 @@
         //         img.style.transition = 'transform 0.3s ease';
         //     });
         // });
-        
-        //======= Pinch-to-Zoom and Pan with Single-Tap Reset =======
-        // images.forEach(img => {
-        //     let initialDistance = 0;
-        //     let initialScale = 1;
-        //     let initialTouch1 = null;
-        //     let initialTouch2 = null;
-        //     let currentScale = 1;
-        //     let isPanning = false;
-        //     let startX = 0;
-        //     let startY = 0;
-        //     let offsetX = 0;
-        //     let offsetY = 0;
-        //     let lastOffsetX = 0;
-        //     let lastOffsetY = 0;
-        //     let tapStartTime = 0;
-        //     let tapTimeout = null;
-        //     const minScale = 1;
-        //     const maxScale = 4;
-
-        //     // Pinch-to-Zoom Start
-        //     img.addEventListener('touchstart', (e) => {
-        //         if (e.touches.length === 2) {
-        //             initialTouch1 = e.touches[0];
-        //             initialTouch2 = e.touches[1];
-        //             initialDistance = Math.sqrt(
-        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
-        //             );
-        //             initialScale = currentScale;
-        //             e.preventDefault();
-        //         } else if (e.touches.length === 1 && currentScale > 1) {
-        //             // Start single-finger panning
-        //             isPanning = true;
-        //             startX = e.touches[0].pageX;
-        //             startY = e.touches[0].pageY;
-        //         }
-        //         // Track tap start time
-        //         tapStartTime = new Date().getTime();
-        //     });
-
-        //     // Pinch-to-Zoom Move
-        //     img.addEventListener('touchmove', (e) => {
-        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.sqrt(
-        //                 (touch1.pageX - touch2.pageX) ** 2 + 
-        //                 (touch1.pageY - touch2.pageY) ** 2
-        //             );
-        //             let scale = initialScale * (distance / initialDistance);
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-        //             currentScale = scale;
-
-        //             img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //             img.style.transformOrigin = 'center';
-        //         } else if (isPanning && e.touches.length === 1) {
-        //             const touch = e.touches[0];
-        //             offsetX = lastOffsetX + (touch.pageX - startX);
-        //             offsetY = lastOffsetY + (touch.pageY - startY);
-
-        //             img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //         }
-        //     });
-
-        //     // End Gesture
-        //     img.addEventListener('touchend', (e) => {
-        //         if (isPanning) {
-        //             lastOffsetX = offsetX;
-        //             lastOffsetY = offsetY;
-        //             isPanning = false;
-        //         }
-        //         initialTouch1 = null;
-        //         initialTouch2 = null;
-        //         img.style.transition = 'transform 0.3s ease';
-
-        //         // Detect Single Tap (if the touch duration is short)
-        //         const tapEndTime = new Date().getTime();
-        //         if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
-        //             // Reset image on single tap
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-        //         }
-        //     });
-
-        //     // Double-Tap Reset (for safety)
-        //     let lastTap = 0;
-        //     img.addEventListener('click', () => {
-        //         let currentTime = new Date().getTime();
-        //         if (currentTime - lastTap < 300) {
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-        //         }
-        //         lastTap = currentTime;
-        //     });
-        // });
-        // //======= Pinch-to-Zoom, Pan, Single-Tap Reset =======
-        // images.forEach(img => {
-        //     let initialDistance = 0;
-        //     let initialScale = 1;
-        //     let initialTouch1 = null;
-        //     let initialTouch2 = null;
-        //     let currentScale = 1;
-        //     let isPanning = false;
-        //     let startX = 0;
-        //     let startY = 0;
-        //     let offsetX = 0;
-        //     let offsetY = 0;
-        //     let lastOffsetX = 0;
-        //     let lastOffsetY = 0;
-        //     let tapStartTime = 0;
-        //     const minScale = 1;
-        //     const maxScale = 4;
-
-        //     // Pinch-to-Zoom Start
-        //     img.addEventListener('touchstart', (e) => {
-        //         if (e.touches.length === 2) {
-        //             initialTouch1 = e.touches[0];
-        //             initialTouch2 = e.touches[1];
-        //             initialDistance = Math.sqrt(
-        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
-        //             );
-        //             initialScale = currentScale;
-        //             e.preventDefault();
-        //         } else if (e.touches.length === 1 && currentScale > 1) {
-        //             // Start single-finger panning
-        //             isPanning = true;
-        //             startX = e.touches[0].pageX;
-        //             startY = e.touches[0].pageY;
-        //         }
-        //         // Track tap start time
-        //         tapStartTime = new Date().getTime();
-        //     });
-
-        //     // Pinch-to-Zoom Move
-        //     img.addEventListener('touchmove', (e) => {
-        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.sqrt(
-        //                 (touch1.pageX - touch2.pageX) ** 2 + 
-        //                 (touch1.pageY - touch2.pageY) ** 2
-        //             );
-        //             let scale = initialScale * (distance / initialDistance);
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-        //             currentScale = scale;
-
-        //             img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //             img.style.transformOrigin = 'center';
-        //         } else if (isPanning && e.touches.length === 1) {
-        //             const touch = e.touches[0];
-        //             offsetX = lastOffsetX + (touch.pageX - startX);
-        //             offsetY = lastOffsetY + (touch.pageY - startY);
-
-        //             img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //         }
-        //     });
-
-        //     // End Gesture
-        //     img.addEventListener('touchend', (e) => {
-        //         if (isPanning) {
-        //             lastOffsetX = offsetX;
-        //             lastOffsetY = offsetY;
-        //             isPanning = false;
-        //         }
-
-        //         initialTouch1 = null;
-        //         initialTouch2 = null;
-        //         img.style.transition = 'transform 0.3s ease';
-
-        //         // Detect Single Tap (if the touch duration is short)
-        //         const tapEndTime = new Date().getTime();
-        //         if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
-        //             // Reset image on single tap
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-        //         }
-        //     });
-
-        //     // Double-Tap Reset (for safety)
-        //     let lastTap = 0;
-        //     img.addEventListener('click', () => {
-        //         let currentTime = new Date().getTime();
-        //         if (currentTime - lastTap < 300) {
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-        //         }
-        //         lastTap = currentTime;
-        //     });
-        // });
-        //======= Pinch-to-Zoom and Pan with Single-Tap Reset =======
-        // images.forEach(img => {
-        //     let initialDistance = 0;
-        //     let initialScale = 1;
-        //     let initialTouch1 = null;
-        //     let initialTouch2 = null;
-        //     let currentScale = 1;
-        //     let isPanning = false;
-        //     let startX = 0;
-        //     let startY = 0;
-        //     let offsetX = 0;
-        //     let offsetY = 0;
-        //     let lastOffsetX = 0;
-        //     let lastOffsetY = 0;
-        //     let tapStartTime = 0;
-        //     let tapTimeout = null;
-        //     const minScale = 1;
-        //     const maxScale = 4;
-
-        //     // Select the slider element (adjust the selector as per your HTML)
-        //     const slider = document.querySelector('.calendar-slider'); // Replace with your actual slider class or ID
-
-        //     // Function to disable scrolling (or slider) when zoomed in
-        //     const disableScrolling = () => {
-        //         document.body.style.overflow = 'hidden';  // Disable page scrolling
-        //         if (slider) {
-        //             slider.style.overflow = 'hidden';  // Disable slider scrolling
-        //         }
-        //     };
-
-        //     // Function to re-enable scrolling when zoom is reset
-        //     const enableScrolling = () => {
-        //         document.body.style.overflow = '';  // Re-enable page scrolling
-        //         if (slider) {
-        //             slider.style.overflow = '';  // Re-enable slider scrolling
-        //         }
-        //     };
-
-        //     // Pinch-to-Zoom Start
-        //     img.addEventListener('touchstart', (e) => {
-        //         if (e.touches.length === 2) {
-        //             initialTouch1 = e.touches[0];
-        //             initialTouch2 = e.touches[1];
-        //             initialDistance = Math.sqrt(
-        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
-        //             );
-        //             initialScale = currentScale;
-        //             e.preventDefault();
-        //         } else if (e.touches.length === 1 && currentScale > 1) {
-        //             // Start single-finger panning
-        //             isPanning = true;
-        //             startX = e.touches[0].pageX;
-        //             startY = e.touches[0].pageY;
-        //         }
-        //         // Track tap start time
-        //         tapStartTime = new Date().getTime();
-        //     });
-
-        //     // Pinch-to-Zoom Move
-        //     img.addEventListener('touchmove', (e) => {
-        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.sqrt(
-        //                 (touch1.pageX - touch2.pageX) ** 2 + 
-        //                 (touch1.pageY - touch2.pageY) ** 2
-        //             );
-        //             let scale = initialScale * (distance / initialDistance);
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-        //             currentScale = scale;
-
-        //             img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //             img.style.transformOrigin = 'center';
-
-        //             // Disable scrolling when zoomed in
-        //             if (currentScale > 1) {
-        //                 disableScrolling();
-        //             } else {
-        //                 enableScrolling();
-        //             }
-        //         } else if (isPanning && e.touches.length === 1) {
-        //             const touch = e.touches[0];
-        //             offsetX = lastOffsetX + (touch.pageX - startX);
-        //             offsetY = lastOffsetY + (touch.pageY - startY);
-
-        //             img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //         }
-        //     });
-
-        //     // End Gesture
-        //     img.addEventListener('touchend', (e) => {
-        //         if (isPanning) {
-        //             lastOffsetX = offsetX;
-        //             lastOffsetY = offsetY;
-        //             isPanning = false;
-        //         }
-
-        //         initialTouch1 = null;
-        //         initialTouch2 = null;
-        //         img.style.transition = 'transform 0.3s ease';
-
-        //         // Detect Single Tap (if the touch duration is short)
-        //         const tapEndTime = new Date().getTime();
-        //         if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
-        //             // Reset image on single tap
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-
-        //             // Re-enable scrolling when zoom is reset
-        //             enableScrolling();
-        //         }
-        //     });
-
-        //     // Double-Tap Reset (for safety)
-        //     let lastTap = 0;
-        //     img.addEventListener('click', () => {
-        //         let currentTime = new Date().getTime();
-        //         if (currentTime - lastTap < 300) {
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-
-        //             // Re-enable scrolling after reset
-        //             enableScrolling();
-        //         }
-        //         lastTap = currentTime;
-        //     });
-        // });
         images.forEach(img => {
             let initialDistance = 0;
             let initialScale = 1;
@@ -787,21 +470,23 @@
             const minScale = 1;
             const maxScale = 4;
 
-            const slider = document.querySelector('.calendar-slider');
+            // Speed factor to slow down the panning when zoomed in
+            const panSpeedFactor = 0.5; // Adjust this value to control the pan speed
+
+            const slider = document.querySelector('.calendar-slider'); // Replace with your actual slider class or ID
 
             const disableScrolling = () => {
                 document.body.style.overflow = 'hidden';
-                if (slider) slider.style.overflow = 'hidden';
+                if (slider) {
+                    slider.style.overflow = 'hidden';
+                }
             };
 
             const enableScrolling = () => {
                 document.body.style.overflow = '';
-                if (slider) slider.style.overflow = '';
-            };
-
-            const applyTransform = () => {
-                img.style.transition = 'transform 0.1s ease-out';
-                img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
+                if (slider) {
+                    slider.style.overflow = '';
+                }
             };
 
             img.addEventListener('touchstart', (e) => {
@@ -809,7 +494,7 @@
                     initialTouch1 = e.touches[0];
                     initialTouch2 = e.touches[1];
                     initialDistance = Math.sqrt(
-                        (initialTouch1.pageX - initialTouch2.pageX) ** 2 +
+                        (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
                         (initialTouch1.pageY - initialTouch2.pageY) ** 2
                     );
                     initialScale = currentScale;
@@ -827,19 +512,30 @@
                     const touch1 = e.touches[0];
                     const touch2 = e.touches[1];
                     const distance = Math.sqrt(
-                        (touch1.pageX - touch2.pageX) ** 2 +
+                        (touch1.pageX - touch2.pageX) ** 2 + 
                         (touch1.pageY - touch2.pageY) ** 2
                     );
                     let scale = initialScale * (distance / initialDistance);
                     scale = Math.max(minScale, Math.min(scale, maxScale));
                     currentScale = scale;
-                    disableScrolling();
-                    applyTransform();
+
+                    img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+                    img.style.transition = 'transform 0s';
+                    img.style.transformOrigin = 'center';
+
+                    if (currentScale > 1) {
+                        disableScrolling();
+                    } else {
+                        enableScrolling();
+                    }
                 } else if (isPanning && e.touches.length === 1) {
                     const touch = e.touches[0];
-                    offsetX = lastOffsetX + (touch.pageX - startX) * 0.5;
-                    offsetY = lastOffsetY + (touch.pageY - startY) * 0.5;
-                    applyTransform();
+                    // Apply pan speed factor to slow down panning on zoomed-in image
+                    offsetX = lastOffsetX + (touch.pageX - startX) * panSpeedFactor;
+                    offsetY = lastOffsetY + (touch.pageY - startY) * panSpeedFactor;
+
+                    img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
+                    img.style.transition = 'transform 0s';
                 }
             });
 
@@ -852,7 +548,7 @@
 
                 initialTouch1 = null;
                 initialTouch2 = null;
-                img.style.transition = 'transform 0.3s ease-out';
+                img.style.transition = 'transform 0.3s ease';
 
                 const tapEndTime = new Date().getTime();
                 if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
@@ -862,6 +558,8 @@
                     lastOffsetX = 0;
                     lastOffsetY = 0;
                     img.style.transform = 'scale(1) translate(0px, 0px)';
+                    img.style.transition = 'transform 0.3s ease';
+
                     enableScrolling();
                 }
             });
@@ -876,426 +574,30 @@
                     lastOffsetX = 0;
                     lastOffsetY = 0;
                     img.style.transform = 'scale(1) translate(0px, 0px)';
-                    img.style.transition = 'transform 0.3s ease-out';
+                    img.style.transition = 'transform 0.3s ease';
+
                     enableScrolling();
                 }
                 lastTap = currentTime;
             });
         });
-         //======= Pinch-to-Zoom and Pan with Single-Tap Reset =======
-        // images.forEach(img => {
-        //     let initialDistance = 0;
-        //     let initialScale = 1;
-        //     let initialTouch1 = null;
-        //     let initialTouch2 = null;
-        //     let currentScale = 1;
-        //     let isPanning = false;
-        //     let startX = 0;
-        //     let startY = 0;
-        //     let offsetX = 0;
-        //     let offsetY = 0;
-        //     let lastOffsetX = 0;
-        //     let lastOffsetY = 0;
-        //     let tapStartTime = 0;
-        //     let tapTimeout = null;
-        //     const minScale = 1;
-        //     const maxScale = 4;
 
-        //     // Select the slider element (adjust the selector as per your HTML)
-        //     const slider = document.querySelector('.calendar-slider'); // Replace with your actual slider class or ID
 
-        //     // Function to disable scrolling (or slider) when zoomed in
-        //     const disableScrolling = () => {
-        //         document.body.style.overflow = 'hidden';  // Disable page scrolling
-        //         if (slider) {
-        //             slider.style.overflow = 'hidden';  // Disable slider scrolling
-        //         }
-        //     };
 
-        //     // Function to re-enable scrolling when zoom is reset
-        //     const enableScrolling = () => {
-        //         document.body.style.overflow = '';  // Re-enable page scrolling
-        //         if (slider) {
-        //             slider.style.overflow = '';  // Re-enable slider scrolling
-        //         }
-        //     };
 
-        //     // Pinch-to-Zoom Start
-        //     img.addEventListener('touchstart', (e) => {
-        //         if (e.touches.length === 2) {
-        //             initialTouch1 = e.touches[0];
-        //             initialTouch2 = e.touches[1];
-        //             initialDistance = Math.sqrt(
-        //                 (initialTouch1.pageX - initialTouch2.pageX) ** 2 + 
-        //                 (initialTouch1.pageY - initialTouch2.pageY) ** 2
-        //             );
-        //             initialScale = currentScale;
-        //             e.preventDefault();
-        //         } else if (e.touches.length === 1 && currentScale > 1) {
-        //             // Start single-finger panning
-        //             isPanning = true;
-        //             startX = e.touches[0].pageX;
-        //             startY = e.touches[0].pageY;
-        //         }
-        //         // Track tap start time
-        //         tapStartTime = new Date().getTime();
-        //     });
-
-        //     // Pinch-to-Zoom Move
-        //     img.addEventListener('touchmove', (e) => {
-        //         if (e.touches.length === 2 && initialTouch1 && initialTouch2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.sqrt(
-        //                 (touch1.pageX - touch2.pageX) ** 2 + 
-        //                 (touch1.pageY - touch2.pageY) ** 2
-        //             );
-        //             let scale = initialScale * (distance / initialDistance);
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-        //             currentScale = scale;
-
-        //             img.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //             img.style.transformOrigin = 'center';
-
-        //             // Disable scrolling when zoomed in
-        //             if (currentScale > 1) {
-        //                 disableScrolling();
-        //             } else {
-        //                 enableScrolling();
-        //             }
-        //         } else if (isPanning && e.touches.length === 1) {
-        //             const touch = e.touches[0];
-        //             offsetX = lastOffsetX + (touch.pageX - startX);
-        //             offsetY = lastOffsetY + (touch.pageY - startY);
-
-        //             img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
-        //             img.style.transition = 'transform 0s';
-        //         }
-        //     });
-
-        //     // End Gesture
-        //     img.addEventListener('touchend', (e) => {
-        //         if (isPanning) {
-        //             lastOffsetX = offsetX;
-        //             lastOffsetY = offsetY;
-        //             isPanning = false;
-        //         }
-
-        //         initialTouch1 = null;
-        //         initialTouch2 = null;
-        //         img.style.transition = 'transform 0.3s ease';
-
-        //         // Detect Single Tap (if the touch duration is short)
-        //         const tapEndTime = new Date().getTime();
-        //         if (tapEndTime - tapStartTime < 300 && e.touches.length === 0) {
-        //             // Reset image on single tap
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-
-        //             // Re-enable scrolling when zoom is reset
-        //             enableScrolling();
-        //         }
-        //     });
-
-        //     // Double-Tap Reset (for safety)
-        //     let lastTap = 0;
-        //     img.addEventListener('click', () => {
-        //         let currentTime = new Date().getTime();
-        //         if (currentTime - lastTap < 300) {
-        //             currentScale = 1;
-        //             offsetX = 0;
-        //             offsetY = 0;
-        //             lastOffsetX = 0;
-        //             lastOffsetY = 0;
-        //             img.style.transform = 'scale(1) translate(0px, 0px)';
-        //             img.style.transition = 'transform 0.3s ease';
-
-        //             // Re-enable scrolling after reset
-        //             enableScrolling();
-        //         }
-        //         lastTap = currentTime;
-        //     });
-        // });
-         
-
-        //======= Canvas-based Zoom Logic (for images) =======
-        // images.forEach(img => {
-        //     let isZoomed = false;
-        //     let startX = 0, startY = 0;
-        //     let scale = 1;
-        //     let currentScale = 1;
-        //     let lastDistance = 0;
-        //     let pinchStartDistance = 0;
-        //     let pinchStartScale = 1;
-
-        //     const minScale = 1;
-        //     const maxScale = 4;
-
-        //     // Create a hidden canvas to manage zoom
-        //     const canvas = document.createElement('canvas');
-        //     const ctx = canvas.getContext('2d');
-        //     document.body.appendChild(canvas);
-        //     canvas.style.display = 'none'; // Hide canvas
-
-        //     // Resize canvas to match the image dimensions
-        //     const resizeCanvas = () => {
-        //         canvas.width = img.naturalWidth;
-        //         canvas.height = img.naturalHeight;
-        //     };
-
-        //     // Draw the image on canvas (after resizing)
-        //     const drawImageOnCanvas = () => {
-        //         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        //     };
-
-        //     // Zoom logic for touchstart (handle pinch)
-        //     img.addEventListener('touchstart', (e) => {
-        //         if (e.touches.length === 2) {
-        //             pinchStartDistance = Math.hypot(
-        //                 e.touches[0].pageX - e.touches[1].pageX,
-        //                 e.touches[0].pageY - e.touches[1].pageY
-        //             );
-        //             pinchStartScale = currentScale;
-        //             e.preventDefault();
-        //         }
-        //     });
-
-        //     // Handle pinch zoom on touchmove
-        //     img.addEventListener('touchmove', (e) => {
-        //         if (e.touches.length === 2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.hypot(
-        //                 touch1.pageX - touch2.pageX,
-        //                 touch1.pageY - touch2.pageY
-        //             );
-
-        //             let scaleDelta = distance / pinchStartDistance;
-        //             scale = pinchStartScale * scaleDelta;
-
-        //             // Limit the scale between minScale and maxScale
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-
-        //             // Calculate the midpoint of the pinch
-        //             const pinchCenterX = (touch1.pageX + touch2.pageX) / 2;
-        //             const pinchCenterY = (touch1.pageY + touch2.pageY) / 2;
-
-        //             // Adjust the transform origin to the pinch center (this moves the zoom point)
-        //             img.style.transformOrigin = `${pinchCenterX}px ${pinchCenterY}px`;
-
-        //             if (scale !== currentScale) {
-        //                 currentScale = scale;
-        //                 img.style.transform = `scale(${scale})`;
-        //                 img.style.transition = 'transform 0s'; // Instant transformation during touchmove
-        //             }
-        //         }
-        //     });
-
-        //     // Zoom reset on touchend (single tap)
-        //     img.addEventListener('touchend', () => {
-        //         if (currentScale !== 1) {
-        //             img.style.transform = 'scale(1)';
-        //             img.style.transition = 'transform 0.3s ease';
-        //             currentScale = 1;
-        //         }
-        //     });
-
-        //     // Use canvas to draw the image when zoomed (instead of directly scaling the image)
-        //     img.addEventListener('touchstart', () => {
-        //         resizeCanvas();
-        //         drawImageOnCanvas();
-        //     });
-
-        //     img.addEventListener('touchmove', (e) => {
-        //         // Calculate the pinch zoom based on the current pinch distance
-        //         if (e.touches.length === 2) {
-        //             const touch1 = e.touches[0];
-        //             const touch2 = e.touches[1];
-        //             const distance = Math.hypot(
-        //                 touch1.pageX - touch2.pageX,
-        //                 touch1.pageY - touch2.pageY
-        //             );
-
-        //             // Recalculate the scale based on the new distance
-        //             let scaleDelta = distance / pinchStartDistance;
-        //             scale = pinchStartScale * scaleDelta;
-
-        //             // Clamp scale to within bounds
-        //             scale = Math.max(minScale, Math.min(scale, maxScale));
-
-        //             // Calculate the pinch center (midpoint of the touch points)
-        //             const pinchCenterX = (touch1.pageX + touch2.pageX) / 2;
-        //             const pinchCenterY = (touch1.pageY + touch2.pageY) / 2;
-
-        //             // Set the transform origin to the pinch center (for dynamic zooming)
-        //             img.style.transformOrigin = `${pinchCenterX}px ${pinchCenterY}px`;
-        //             img.style.transform = `scale(${scale})`;
-        //             img.style.transition = 'transform 0s'; // No transition while zooming
-        //         }
-        //     });
-        // });
-         
     </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
+                    .then((reg) => {
+                        console.log('Service Worker registered:', reg);
+                    })
+                    .catch((err) => {
+                        console.error('Service Worker registration failed:', err);
+                    });
+            });
+        }
+    </script>   
 </body>
 </html>
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mobile Image Zoom, Pan & Reset</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            touch-action: none; /* Disable default pinch-zoom */
-        }
-        canvas {
-            display: block;
-            background: #000;
-        }
-        .reset-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            background: #ff5722;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 1000;
-        }
-    </style>
-</head>
-<body>
-    <button class="reset-btn" onclick="resetImage()">Reset</button>
-    <canvas id="zoomCanvas"></canvas>
-    <script>
-        const canvas = document.getElementById('zoomCanvas');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        let img = new Image();
-        img.src = 'https://hadapsarmedicalassociation.com/cal2025/static/images/January.jpeg';
-
-        // State Variables
-        let offsetX = 0, offsetY = 0; // Pan position
-        let scale = 1; // Zoom level
-        let lastScale = 1;
-        let startX = 0, startY = 0;
-        let isPanning = false;
-        let initialDistance = null;
-
-        // Image Original State
-        const defaultState = {
-            offsetX: 0,
-            offsetY: 0,
-            scale: 1
-        };
-
-        img.onload = () => {
-            resetImage();
-        };
-
-        function drawImage() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.translate(offsetX, offsetY);
-            ctx.scale(scale, scale);
-            ctx.drawImage(img, 0, 0, img.width, img.height, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
-        }
-
-        // Constrain Pan Position
-        function constrainPan() {
-            const scaledWidth = canvas.width * scale;
-            const scaledHeight = canvas.height * scale;
-
-            const minX = Math.min(0, canvas.width - scaledWidth);
-            const minY = Math.min(0, canvas.height - scaledHeight);
-            const maxX = Math.max(0, scaledWidth - canvas.width);
-            const maxY = Math.max(0, scaledHeight - canvas.height);
-
-            offsetX = Math.min(Math.max(offsetX, minX), maxX);
-            offsetY = Math.min(Math.max(offsetY, minY), maxY);
-        }
-
-        // Touch Event Handlers
-        canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                // Single touch for panning
-                isPanning = true;
-                startX = e.touches[0].clientX - offsetX;
-                startY = e.touches[0].clientY - offsetY;
-            } else if (e.touches.length === 2) {
-                // Two fingers for zooming
-                isPanning = false;
-                initialDistance = getDistance(e.touches[0], e.touches[1]);
-                lastScale = scale;
-            }
-        });
-
-        canvas.addEventListener('touchmove', (e) => {
-            e.preventDefault();
-
-            if (isPanning && e.touches.length === 1) {
-                // Pan with single finger
-                offsetX = e.touches[0].clientX - startX;
-                offsetY = e.touches[0].clientY - startY;
-                constrainPan();
-            } else if (e.touches.length === 2) {
-                // Zoom with two fingers
-                const currentDistance = getDistance(e.touches[0], e.touches[1]);
-                const zoomFactor = currentDistance / initialDistance;
-                scale = Math.max(1, Math.min(lastScale * zoomFactor, 5)); // Limit zoom 1x - 5x
-                constrainPan();
-            }
-
-            drawImage();
-        });
-
-        canvas.addEventListener('touchend', (e) => {
-            if (e.touches.length === 0) {
-                isPanning = false;
-                initialDistance = null;
-                // Reset to default if zoom is back to 1x
-                if (scale === 1) {
-                    resetImage();
-                }
-            }
-        });
-
-        // Utility Functions
-        function getDistance(touch1, touch2) {
-            return Math.sqrt(
-                Math.pow(touch1.clientX - touch2.clientX, 2) +
-                Math.pow(touch1.clientY - touch2.clientY, 2)
-            );
-        }
-
-        function resetImage() {
-            scale = defaultState.scale;
-            offsetX = defaultState.offsetX;
-            offsetY = defaultState.offsetY;
-            drawImage();
-        }
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            resetImage();
-        });
-    </script>
-</body>
-</html> -->

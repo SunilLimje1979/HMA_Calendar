@@ -200,7 +200,68 @@
         } */
         /* Calendar Specific Styles */
         
-         
+        /* === Tablet/iPad View (768px - 1024px) === */
+        @media (min-width: 768px) and (max-width: 1024px) {
+            .calendar-slider {
+                display: flex;
+                overflow-x: auto; /* Enable horizontal scrolling */
+                scroll-snap-type: x mandatory; /* Snap to each image */
+                -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+                gap: 0; /* Remove gaps between images */
+                scroll-behavior: smooth; /* Ensure smooth transition */
+            }
+
+            .calendar-img-container {
+                display: flex;
+                flex-direction: row; /* Horizontal layout */
+            }
+
+            .calendar-img {
+                flex: 0 0 100%; /* Each image takes full width of the viewport */
+                width: 100vw; /* Full screen width */
+                height: auto; /* Adjust height automatically */
+                max-height: 90vh; /* Ensure it doesn’t overflow vertically */
+                object-fit: contain; /* Ensure the whole image fits in the viewport */
+                scroll-snap-align: start; /* Snap each image properly */
+                transition: transform 0.3s ease-in-out;
+            }
+
+            /* Ensure smooth scrolling */
+            .calendar-slider::-webkit-scrollbar {
+                display: none; /* Hide scrollbar on iOS and Chrome */
+            }
+
+            .calendar-slider {
+                scrollbar-width: none; /* Hide scrollbar on Firefox */
+                overscroll-behavior-x: contain; /* Prevent bounce effect */
+            }
+
+            /* Toggle Button Icon Styling for Tablets */
+            .toggle-icon {
+                width: 80px; /* Slightly larger size */
+                height: 80px;
+                bottom: 50px; /* Adjust positioning */
+                right: 40px;
+            }
+
+            .toggle-icon img.icon-img {
+                width: 70%;
+                height: 70%;
+            }
+
+        }
+
+        /* === Larger Screens (1025px and above, Laptop & iPad Pro) === */
+        @media (min-width: 1025px) {
+            .calendar-slider {
+                justify-content: flex-start;  /* Align images to the left for larger screens */
+            }
+
+            .calendar-img {
+                width: 80%;  /* Adjust image width to fit larger screens */
+            }
+        }
+
 
 
 
