@@ -11,5 +11,5 @@ def index(request):
 def calendar_view(request):
     return render(request, 'calendar.html')
 
-# def demo(request):
-#     return render(request,'demo.html')
+def demo(request):
+    return render(request,'calendar1.html')
