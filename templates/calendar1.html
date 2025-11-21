@@ -5,304 +5,390 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no">
-    <title>New HMA Calendar</title>
+    <title>HMA Calendar 2025</title>
     <link rel="manifest" href="{% static 'manifest.json' %}">
     <link rel="shortcut icon" href="{% static 'images/HMALogo.png' %}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"/>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #b0dcf5;
-            overflow-x: hidden;
-            position: relative;
-        }
-        .navbar {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            z-index: 1001;
-            background-color: #005ba6 !important;
-            max-width: 450px; 
-            margin: 0 auto;   
-            left: 0;
-            right: 0;
-        }
-        .navbar-brand img {
-            box-shadow: none;
-        }
-        .three-dot-menu {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            font-size: 1.5em;
-            color: white;
-        }
-        .about-us-text {
-            display: none;
-            position: absolute;
-            top: 40px;
-            right: 20px;
-            background-color: #fff;
-            padding: 5px 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .calendar-container {
-            max-width: 450px;     
-            margin: 70px auto 0; 
-            position: relative;
-        }
-        .calendar-slider {
-            display: flex;
-            overflow-x: auto;
-            scroll-snap-type: x mandatory;
-            scrollbar-width: none;
-        }
-        .calendar-slider::-webkit-scrollbar {
-            display: none;
-        }
-        .calendar-img-container {
-            display: flex;
-            flex-shrink: 0;
-        }
-        .calendar-img {
-            flex-shrink: 0;
-            scroll-snap-align: center;
-        }
-        #top-slider-front .calendar-img-container,
-        #bottom-slider-front .calendar-img-container {
-            gap: 10px; 
-        }
-
-        /* --- MODIFICATION: Reduced height to tighten layout on tall screens --- */
-        #top-slider-front .calendar-img,
-        #bottom-slider-front .calendar-img {
-            width: 100vw; 
-            max-width: 450px; 
-            /*height: 17vh;  Was 18vh */
-            object-fit: cover;
-            object-position: center; 
-        }
+        /* --- STANDARD CSS --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background-color: #b0dcf5; overflow-x: hidden; position: relative; }
+        .navbar { box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); z-index: 1001; background-color: #005ba6 !important; max-width: 450px; margin: 0 auto; left: 0; right: 0; }
+        .navbar-brand img { box-shadow: none; }
+        .three-dot-menu { position: absolute; top: 10px; right: 10px; cursor: pointer; font-size: 1.5em; color: white; }
+        .about-us-text { display: none; position: absolute; top: 40px; right: 20px; background-color: #fff; padding: 5px 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); border-radius: 5px; cursor: pointer; z-index: 2000; }
+        .calendar-container { max-width: 450px; margin: 70px auto 0; position: relative; }
         
-        #middle-slider-front .calendar-img-container {
-            display: flex;
-            gap: 10px; 
+        .calendar-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+        .calendar-slider::-webkit-scrollbar { display: none; }
+        .calendar-img-container { display: flex; flex-shrink: 0; position: relative; }
+        .calendar-img { flex-shrink: 0; scroll-snap-align: center; }
+        
+        #top-slider-front .calendar-img, #bottom-slider-front .calendar-img { width: 100vw; max-width: 450px; object-fit: cover; object-position: center; }
+        #top-slider-front .calendar-img-container, #bottom-slider-front .calendar-img-container { gap: 10px; }
+        #middle-slider-front .calendar-img-container { display: flex; gap: 10px; }
+        #middle-slider-front { padding-left: 5px; }
+        #middle-slider-front .calendar-img { width: 95vw; max-width: calc(450px * 0.95); object-fit: contain; border-radius: 10px; }
+        #middle-slider-back .calendar-img { width: 100vw; max-width: 450px; height: 65vh; object-fit: contain; }
+        
+        .toggle-icon { position: fixed; bottom: 40px; right: 30px; background-color: rgba(255, 255, 255, 0.975); width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; z-index: 1000; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); }
+        .toggle-icon img.icon-img { width: 90%; height: 90%; object-fit: contain; padding: 10px; }
+        
+        /* --- MODALS --- */
+        .modal { display: none; position: fixed; z-index: 3000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.9); justify-content: center; align-items: center; }
+        .modal-content { margin: auto; display: block; width: 95%; max-width: 1000px; max-height: 90vh; }
+        .close-modal { position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px; font-weight: bold; cursor: pointer; }
+
+        #dateDetailModal { background-color: rgba(0, 0, 0, 0.6); }
+        .date-modal-box { 
+            background: white; width: 85%; max-width: 350px; 
+            border-radius: 15px; padding: 20px; text-align: center; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); animation: popIn 0.3s ease;
         }
-        #middle-slider-front {
-            padding-left: 5px; 
-        }
-        #middle-slider-front .calendar-img {
-            width: 95vw;
-            max-width: calc(450px * 0.95);
-            /* height: 58vh;  */
-            object-fit: contain;
-            border-radius: 10px;
-        }
-        #middle-slider-back .calendar-img {
-            width: 100vw;
-            max-width: 450px;
-            height: 65vh;
-            object-fit: contain;
-        }
-        .toggle-icon {
-            position: fixed;
-            bottom: 40px;
-            right: 30px;
-            background-color: rgba(255, 255, 255, 0.975);
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-        .toggle-icon img.icon-img {
-            width: 90%;
-            height: 90%;
-            object-fit: contain;
-            padding: 10px;
-        }
-        .modal {
-            display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%;
-            height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.9);
-            justify-content: center; align-items: center;
-        }
-        .modal-content {
-            margin: auto; display: block; width: 95%; max-width: 1000px; max-height: 90vh;
-        }
-        .close-modal {
-            position: absolute; top: 15px; right: 35px; color: #f1f1f1; font-size: 40px;
-            font-weight: bold; cursor: pointer;
-        }
-        @keyframes infiniteScroll {
-            from { transform: translateX(0); }
-            to { transform: translateX(-50%); }
-        }
-        .infinite-scroll .calendar-img-container {
-            animation: infiniteScroll 40s linear infinite;
-        }
-        .infinite-scroll:hover .calendar-img-container,
-        .infinite-scroll.paused .calendar-img-container {
-            animation-play-state: paused;
-        }
+        .date-modal-header { font-size: 1.5rem; font-weight: bold; color: #005ba6; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .date-modal-body { font-size: 1.1rem; color: #333; margin-bottom: 20px; min-height: 40px; line-height: 1.4; }
+        .date-modal-close { background: #005ba6; color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; }
+        
+        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes infiniteScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .infinite-scroll .calendar-img-container { animation: infiniteScroll 40s linear infinite; }
+        .infinite-scroll:hover .calendar-img-container, .infinite-scroll.paused .calendar-img-container { animation-play-state: paused; }
     </style>
 </head>
 <body>
-    <!-- HTML Body is Unchanged -->
+
     <nav class="navbar fixed-top shadow-sm bg-white px-3 d-flex justify-content-between align-items-center">
-        <div class="navbar-brand">
-            <img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" style="width: 80px; height: auto; border-radius: 5px;">
-        </div>
-        <div class="three-dot-menu" id="three-dot-menu">
-            <i class="fas fa-ellipsis-v"></i>
-        </div>
-        <div class="about-us-text" id="about-us-text">
-            <a href="https://www.google.com/" target="_blank" style="text-decoration: none; color: inherit;">About Us</a>
-        </div>
+        <div class="navbar-brand"><img src="{% static 'images/HMALogo.png' %}" alt="HMA Logo" style="width: 80px; height: auto; border-radius: 5px;"></div>
+        <div class="three-dot-menu" id="three-dot-menu"><i class="fas fa-ellipsis-v"></i></div>
+        <div class="about-us-text" id="about-us-text"><a href="https://www.google.com/" target="_blank" style="text-decoration: none; color: inherit;">About Us</a></div>
     </nav>
+
     <div class="calendar-container">
         <div id="top-slider-front" class="calendar-slider infinite-scroll">
             <div class="calendar-img-container">
                 <img src="{% static 'images/newflow/JanTop1.jpeg' %}" class="calendar-img" data-month="1"><img src="{% static 'images/newflow/FebTop.jpeg' %}" class="calendar-img" data-month="2"><img src="{% static 'images/newflow/MarchTop.jpeg' %}" class="calendar-img" data-month="3"><img src="{% static 'images/newflow/AprilTop.jpeg' %}" class="calendar-img" data-month="4"><img src="{% static 'images/newflow/MayTop.jpeg' %}" class="calendar-img" data-month="5"><img src="{% static 'images/newflow/JuneTop.jpeg' %}" class="calendar-img" data-month="6"><img src="{% static 'images/newflow/JulyTop.jpeg' %}" class="calendar-img" data-month="7"><img src="{% static 'images/newflow/AugustTop.jpeg' %}" class="calendar-img" data-month="8"><img src="{% static 'images/newflow/SeptTop.jpeg' %}" class="calendar-img" data-month="9"><img src="{% static 'images/newflow/OctoberTop.jpeg' %}" class="calendar-img" data-month="10"><img src="{% static 'images/newflow/NovTop.jpeg' %}" class="calendar-img" data-month="11"><img src="{% static 'images/newflow/DecTop.jpeg' %}" class="calendar-img" data-month="12">
             </div>
         </div>
+
+        <!-- Middle Calendar -->
         <div id="middle-slider-front" class="calendar-slider">
             <div class="calendar-img-container">
-                <img src="{% static 'images/newflow/January1.jpeg' %}" class="calendar-img zoomable" data-month="1"><img src="{% static 'images/newflow/Feb1.jpeg' %}" class="calendar-img zoomable" data-month="2"><img src="{% static 'images/newflow/March.jpeg' %}" class="calendar-img zoomable" data-month="3"><img src="{% static 'images/newflow/April.jpeg' %}" class="calendar-img zoomable" data-month="4"><img src="{% static 'images/newflow/May.jpeg' %}" class="calendar-img zoomable" data-month="5"><img src="{% static 'images/newflow/June.jpeg' %}" class="calendar-img zoomable" data-month="6"><img src="{% static 'images/newflow/July.jpeg' %}" class="calendar-img zoomable" data-month="7"><img src="{% static 'images/newflow/August.jpeg' %}" class="calendar-img zoomable" data-month="8"><img src="{% static 'images/newflow/Sept.jpeg' %}" class="calendar-img zoomable" data-month="9"><img src="{% static 'images/newflow/October.jpeg' %}" class="calendar-img zoomable" data-month="10"><img src="{% static 'images/newflow/Nov.jpeg' %}" class="calendar-img zoomable" data-month="11"><img src="{% static 'images/newflow/Dec.jpeg' %}" class="calendar-img zoomable" data-month="12">
+                <img src="{% static 'images/newflow/January1.jpeg' %}" class="calendar-img zoomable" data-month="1">
+                <img src="{% static 'images/newflow/Feb1.jpeg' %}" class="calendar-img zoomable" data-month="2">
+                <img src="{% static 'images/newflow/March.jpeg' %}" class="calendar-img zoomable" data-month="3">
+                <img src="{% static 'images/newflow/April.jpeg' %}" class="calendar-img zoomable" data-month="4">
+                <img src="{% static 'images/newflow/May.jpeg' %}" class="calendar-img zoomable" data-month="5">
+                <img src="{% static 'images/newflow/June.jpeg' %}" class="calendar-img zoomable" data-month="6">
+                <img src="{% static 'images/newflow/July.jpeg' %}" class="calendar-img zoomable" data-month="7">
+                <img src="{% static 'images/newflow/August.jpeg' %}" class="calendar-img zoomable" data-month="8">
+                <img src="{% static 'images/newflow/Sept.jpeg' %}" class="calendar-img zoomable" data-month="9">
+                <img src="{% static 'images/newflow/October.jpeg' %}" class="calendar-img zoomable" data-month="10">
+                <img src="{% static 'images/newflow/Nov.jpeg' %}" class="calendar-img zoomable" data-month="11">
+                <img src="{% static 'images/newflow/Dec.jpeg' %}" class="calendar-img zoomable" data-month="12">
             </div>
         </div>
+
         <div id="middle-slider-back" class="calendar-slider" style="display: none;">
             <div class="calendar-img-container">
                 <img src="{% static 'images/January(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="1"><img src="{% static 'images/Feb(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="2"><img src="{% static 'images/March(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="3"><img src="{% static 'images/April(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="4"><img src="{% static 'images/May(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="5"><img src="{% static 'images/June(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="6"><img src="{% static 'images/July(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="7"><img src="{% static 'images/August(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="8"><img src="{% static 'images/Sept(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="9"><img src="{% static 'images/Oct(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="10"><img src="{% static 'images/Nov(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="11"><img src="{% static 'images/Dec(Back Side).jpeg' %}" class="calendar-img zoomable" data-month="12">
             </div>
         </div>
+
         <div id="bottom-slider-front" class="calendar-slider infinite-scroll">
             <div class="calendar-img-container">
                 <img src="{% static 'images/newflow/JanBottom.jpeg' %}" class="calendar-img" data-month="1"><img src="{% static 'images/newflow/FebBottom.jpeg' %}" class="calendar-img" data-month="2"><img src="{% static 'images/newflow/MarchBottom.jpeg' %}" class="calendar-img" data-month="3"><img src="{% static 'images/newflow/AprilBottom.jpeg' %}" class="calendar-img" data-month="4"><img src="{% static 'images/newflow/MayBottom.jpeg' %}" class="calendar-img" data-month="5"><img src="{% static 'images/newflow/JuneBottom.jpeg' %}" class="calendar-img" data-month="6"><img src="{% static 'images/newflow/JulyBottom.jpeg' %}" class="calendar-img" data-month="7"><img src="{% static 'images/newflow/AugustBottom.jpeg' %}" class="calendar-img" data-month="8"><img src="{% static 'images/newflow/SeptBottom.jpeg' %}" class="calendar-img" data-month="9"><img src="{% static 'images/newflow/OctoberBottom.jpeg' %}" class="calendar-img" data-month="10"><img src="{% static 'images/newflow/NovBottom.jpeg' %}" class="calendar-img" data-month="11"><img src="{% static 'images/newflow/DecBottom.jpeg' %}" class="calendar-img" data-month="12">
             </div>
         </div>
     </div>
-    <div class="toggle-icon" id="toggle-icon">
-        <img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img">
-    </div>
+
+    <div class="toggle-icon" id="toggle-icon"><img src="{% static 'images/Calendarturn.jpeg' %}" alt="Toggle Icon" class="icon-img"></div>
+
     <div id="imageModal" class="modal">
         <span class="close-modal" id="closeModal">&times;</span>
         <img class="modal-content" id="modalImage">
     </div>
 
+    <div id="dateDetailModal" class="modal">
+        <div class="date-modal-box">
+            <div class="date-modal-header" id="dateModalTitle"></div>
+            <div class="date-modal-body" id="dateModalContent"></div>
+            <button class="date-modal-close" id="closeDateModal">Close</button>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 1. CALENDAR CONFIGURATION (VERTICAL FLOW) ---
+            const calendarConfig = {
+                // --- JANUARY 2025 ---
+                "1": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Jan 1 is Wednesday (Budhwar). Offset = 3.
+                    startCellOffset: 3, 
+                    events: {
+                        "1": "New Year Start / Nutan Varsh",
+                        "3": "Savitribai Phule Jayanti",
+                        "12": "Swami Vivekananda Jayanti / Youth Day",
+                        "14": "Makar Sankranti",
+                        "26": "Republic Day (Prajasattak Din)"
+                    }
+                },
+
+                // --- FEBRUARY 2025 ---
+                "2": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Feb 1 is Saturday (Shanivar). Offset = 6.
+                    startCellOffset: 6, 
+                    events: {
+                        "2": "Vasant Panchami",
+                        "10": "Shri Vishwakarma Jayanti",
+                        "19": "Chhatrapati Shivaji Maharaj Jayanti",
+                        "26": "Mahashivratri",
+                        "27": "Marathi Bhasha Gaurav Din"
+                    }
+                },
+
+                // --- MARCH 2025 ---
+                "3": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // March 1 is Saturday (Shanivar). Offset = 6.
+                    startCellOffset: 6,
+                     
+                    // --- ADD THIS BLOCK ---
+                    customSlots: [
+                        { r: 0, c: 0, date: 30 }, // Row 0 (Sunday), Col 0 -> Date 30
+                        { r: 1, c: 0, date: 31 }  // Row 1 (Monday), Col 0 -> Date 31
+                    ],
+                    // ---------------------- 
+                    events: {
+                        "8": "International Women's Day",
+                        "14": "Holi / Hutashani Purnima",
+                        "15": "Dhulivandan",
+                        "30": "Gudi Padwa / Hindu New Year",
+                        "31": "Ramzan Eid"
+                    }
+                },
+                "4": { // April 2025
+                    // These coordinates match your calibration (The outer box of all numbers)
+                    gridArea: { 
+                        xStart: 0.0611, 
+                        xEnd: 0.81, 
+                        yStart: 0.1395, 
+                        yEnd: 0.9788 
+                    },
+                    // !!! IMPORTANT CHANGES HERE !!!
+                    rows: 7, // 7 Days (Sunday to Saturday)
+                    cols: 5, // 5 Columns of dates
+                    // April 1 is Tuesday.
+                    // In this layout: Row 0=Sun, Row 1=Mon, Row 2=Tue.
+                    // So the first date (1) starts at Row 2.
+                    startCellOffset: 2, 
+                    isVertical: true, // New Flag for your specific layout
+                    events: {
+                        "1": "Consultation on Physiotherapy",
+                        "9": "Gudi Padwa / Hindu New Year",
+                        "14": "Dr. Babasaheb Ambedkar Jayanti",
+                        "17": "Ram Navami",
+                        "23": "Hanuman Jayanti"
+                    }
+                },
+
+                "5": { // MAY 2025
+                    gridArea: { 
+                        xStart: 0.0611,  // Same as April
+                        xEnd: 0.81,      // Same fixed value as April
+                        yStart: 0.1395,  // Same as April
+                        yEnd: 0.9788     // Same as April
+                    },
+                    rows: 7, 
+                    cols: 5, 
+                    isVertical: true,    // Vertical Flow
+                    startCellOffset: 4,  // May 1st is Thursday (Guruvar) -> 4
+                    events: {
+                        "1": "Maharashtra Din / Int'l Worker's Day",
+                        "7": "Bhanu Saptami",
+                        "10": "Akshaya Tritiya / Parshuram Jayanti",
+                        "12": "Buddha Purnima",
+                        "14": "Chhatrapati Sambhaji Maharaj Jayanti",
+                        "29": "Maharana Pratap Jayanti"
+                    }
+                },
+                // --- JUNE 2025 ---
+                "6": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // June 1 is Sunday (Ravivar). Sun=0.
+                    startCellOffset: 0, 
+                    events: {
+                        "5": "World Environment Day",
+                        "6": "Shivrajyabhishek Din",
+                        "7": "Bakri Eid",
+                        "16": "Fathers Day",
+                        "21": "International Yoga Day",
+                        "27": "Rath Yatra"
+                    }
+                },
+
+                // --- JULY 2025 ---
+                "7": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // July 1 is Tuesday (Mangalwar). Tue=2.
+                    startCellOffset: 2, 
+                    events: {
+                        "1": "Doctor's Day / Ashadhi Ekadashi",
+                        "6": "Moharram",
+                        "11": "World Population Day",
+                        "21": "Guru Purnima"
+                    }
+                },
+
+                // --- AUGUST 2025 ---
+                "8": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // August 1 is Friday (Shukravar). Fri=5.
+                    startCellOffset: 5, 
+
+                    customSlots: [
+                        { r: 0, c: 0, date: 31 }, // Row 0 (Sunday), Col 0 -> Date 31
+                    ],
+
+                    events: {
+                        "9": "Nag Panchami",
+                        "15": "Independence Day / Raksha Bandhan / Narali Purnima",
+                        "16": "Gopalkala / Dahi Handi",
+                        "27": "Ganesh Chaturthi",
+                        "28": "Rishi Panchami"
+                    }
+                },
+
+                // --- SEPTEMBER 2025 ---
+                "9": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Sept 1 is Monday (Somvar). Offset = 1.
+                    startCellOffset: 1, 
+                    events: {
+                        "1": "Jyeshtha Gauri Pujan",
+                        "2": "Pola / Pithori Amavasya",
+                        "6": "Gauri Visarjan",
+                        "7": "Ganesh Visarjan (1.5 Days)",
+                        "16": "Eid-e-Milad",
+                        "17": "Anant Chaturdashi / Visarjan",
+                        "22": "Ghatasthapana (Navratri Start)"
+                    }
+                },
+
+                // --- OCTOBER 2025 ---
+                "10": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Oct 1 is Wednesday (Budhwar). Offset = 3.
+                    startCellOffset: 3, 
+
+                    events: {
+                        "2": "Dasara / Gandhi Jayanti",
+                        "7": "Kojagiri Purnima",
+                        "20": "Narak Chaturdashi (Diwali)",
+                        "21": "Lakshmi Pujan (Diwali)",
+                        "22": "Balipratipada (Diwali Padwa)",
+                        "23": "Bhaubeej"
+                    }
+                },
+
+                // --- NOVEMBER 2025 ---
+                "11": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Nov 1 is Saturday (Shanivar). Offset = 6.
+                    startCellOffset: 6, 
+                    
+                    customSlots: [
+                        { r: 0, c: 0, date: 30 }, // Row 0 (Sunday), Col 0 -> Date 30
+                    ],
+
+                    events: {
+                        "1": "Kartiki Ekadashi",
+                        "5": "Guru Nanak Jayanti / Tripuri Purnima",
+                        "14": "Children's Day (Bal Din)",
+                        "15": "Birsa Munda Jayanti"
+                    }
+                },
+
+                // --- DECEMBER 2025 ---
+                "12": { 
+                    gridArea: { 
+                        xStart: 0.0611, xEnd: 0.81, 
+                        yStart: 0.1395, yEnd: 0.9788 
+                    },
+                    rows: 7, cols: 5, 
+                    isVertical: true,
+                    // Dec 1 is Monday (Somvar). Offset = 1.
+                    startCellOffset: 1, 
+                    events: {
+                        "3": "World Disability Day",
+                        "6": "Dr. Ambedkar Mahaparinirvan Din",
+                        "11": "Gita Jayanti",
+                        "25": "Christmas (Natal)",
+                        "31": "New Year's Eve"
+                    }
+                }
+            };
+
+            // --- 2. GENERAL SETUP ---
             const topSlider = document.getElementById('top-slider-front');
             const middleSliderFront = document.getElementById('middle-slider-front');
             const middleSliderBack = document.getElementById('middle-slider-back');
             const bottomSlider = document.getElementById('bottom-slider-front');
             const toggleIcon = document.getElementById('toggle-icon');
             const modal = document.getElementById('imageModal');
+            const dateModal = document.getElementById('dateDetailModal');
             const initialMonthIndex = new Date().getMonth();
             let restartAutoplayTimer; 
 
-            const scrollToMonth = (slider, monthIndex, behavior = 'smooth') => {
-                const image = slider.querySelector(`.calendar-img:not(.clone)[data-month='${monthIndex + 1}']`);
-                if (image) {
-                    const scrollPos = image.offsetLeft - (slider.offsetWidth - image.offsetWidth) / 2;
-                    slider.scrollTo({ left: scrollPos, behavior: behavior });
-                }
-            };
-            
-            const setupContinuousSlider = (slider) => {
-                const container = slider.querySelector('.calendar-img-container');
-                const images = Array.from(container.children);
-                images.forEach(img => {
-                    const clone = img.cloneNode(true);
-                    clone.classList.add('clone');
-                    container.appendChild(clone);
-                });
-            };
-
-            const pauseAnimation = () => {
-                topSlider.classList.add('paused');
-                bottomSlider.classList.add('paused');
-            };
-
-            const resumeAnimation = () => {
-                topSlider.classList.remove('paused');
-                bottomSlider.classList.remove('paused');
-            };
-            
-            const handleBannerInteraction = () => {
-                pauseAnimation();
-                clearTimeout(restartAutoplayTimer); 
-                restartAutoplayTimer = setTimeout(resumeAnimation, 5000);
-            };
-
-            [topSlider, bottomSlider].forEach(slider => {
-                slider.addEventListener('touchstart', handleBannerInteraction, { passive: true });
-            });
-            
-            const getVisibleMonthIndex = (slider) => {
-                const sliderRect = slider.getBoundingClientRect();
-                const sliderCenter = sliderRect.left + sliderRect.width / 2;
-                let closestDist = Infinity;
-                let visibleIndex = 0;
-                slider.querySelectorAll('.calendar-img').forEach((img) => {
-                    const imgRect = img.getBoundingClientRect();
-                    const imgCenter = imgRect.left + imgRect.width / 2;
-                    const dist = Math.abs(sliderCenter - imgCenter);
-                    if (dist < closestDist) {
-                        closestDist = dist;
-                        visibleIndex = parseInt(img.dataset.month) - 1;
-                    }
-                });
-                return visibleIndex;
-            };
-
-            toggleIcon.addEventListener('click', () => {
-                const isFrontVisible = middleSliderFront.style.display !== 'none';
-                const activeSlider = isFrontVisible ? middleSliderFront : middleSliderBack;
-                const inactiveSlider = isFrontVisible ? middleSliderBack : middleSliderFront;
-                const currentMonthIndex = getVisibleMonthIndex(activeSlider);
-                activeSlider.style.opacity = '0';
-                setTimeout(() => {
-                    activeSlider.style.display = 'none';
-                    inactiveSlider.style.display = 'flex';
-                    scrollToMonth(inactiveSlider, currentMonthIndex, 'auto');
-                    setTimeout(() => inactiveSlider.style.opacity = '1', 50);
-                }, 300);
-            });
-
-            document.querySelectorAll('#top-slider-front .calendar-img, #bottom-slider-front .calendar-img').forEach(img => {
-                img.addEventListener('click', (e) => {
-                    if(e.target.classList.contains('clone')) return;
-                    modal.style.display = 'flex';
-                    document.getElementById('modalImage').src = e.target.src;
-                    handleBannerInteraction();
-                });
-            });
-            document.getElementById('closeModal').addEventListener('click', () => {
-                modal.style.display = 'none';
-                handleBannerInteraction();
-            });
-            document.getElementById('three-dot-menu').addEventListener('click', () => {
-                const aboutUsText = document.getElementById('about-us-text');
-                aboutUsText.style.display = (aboutUsText.style.display === 'block') ? 'none' : 'block';
-            });
-            
-            window.addEventListener('load', () => {
-                setupContinuousSlider(topSlider);
-                setupContinuousSlider(bottomSlider);
-                scrollToMonth(middleSliderFront, initialMonthIndex, 'auto');
-            });
-
-            // --- MODIFICATION: Full, working Zoom and Pan Logic for ALL '.zoomable' images ---
+            // --- 3. CLICK LOGIC (Updated for Vertical) ---
             const applyZoomLogic = (img) => {
                 let initialDistance = 0, initialScale = 1, currentScale = 1;
                 let isPanning = false, startX = 0, startY = 0;
@@ -312,11 +398,9 @@
                 const disableScrolling = () => { document.body.style.overflow = 'hidden'; };
                 const enableScrolling = () => { document.body.style.overflow = ''; };
 
+                // Touch Logic (No changes)
                 img.addEventListener('touchstart', (e) => {
-                    // Only pause the animation if a zoom/pan gesture starts
-                    if (e.touches.length > 1 || currentScale > 1) {
-                        handleBannerInteraction(); 
-                    }
+                    if (e.touches.length > 1 || currentScale > 1) handleBannerInteraction();
                     if (e.touches.length === 2) {
                         isPanning = false;
                         initialDistance = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
@@ -329,14 +413,11 @@
                 });
 
                 img.addEventListener('touchmove', (e) => {
-                    if (e.touches.length === 2 || isPanning) {
-                        e.preventDefault(); 
-                    }
+                    if (e.touches.length === 2 || isPanning) e.preventDefault();
                     if (e.touches.length === 2) {
                         const newDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
                         currentScale = Math.max(1, Math.min(initialScale * (newDist / initialDistance), 4));
                         img.style.transform = `scale(${currentScale}) translate(${offsetX}px, ${offsetY}px)`;
-                        img.style.transition = 'none';
                         if (currentScale > 1) disableScrolling();
                     } else if (isPanning && e.touches.length === 1) {
                         offsetX = e.touches[0].pageX - startX;
@@ -346,44 +427,167 @@
                 });
 
                 img.addEventListener('touchend', (e) => {
-                    if (isPanning) {
-                        lastOffsetX = offsetX;
-                        lastOffsetY = offsetY;
-                        isPanning = false;
-                    }
+                    if (isPanning) { lastOffsetX = offsetX; lastOffsetY = offsetY; isPanning = false; }
                     if (currentScale <= 1) {
-                        currentScale = 1;
-                        offsetX = 0; offsetY = 0;
-                        lastOffsetX = 0; lastOffsetY = 0;
+                        currentScale = 1; offsetX = 0; offsetY = 0; lastOffsetX = 0; lastOffsetY = 0;
                         img.style.transform = 'scale(1) translate(0, 0)';
-                        img.style.transition = 'transform 0.3s ease';
                         enableScrolling();
                     }
                 });
 
-                img.addEventListener('click', () => {
-                    let currentTime = new Date().getTime();
-                    if (currentTime - lastTap < 300) {
-                        currentScale = 1;
-                        offsetX = 0; offsetY = 0;
-                        lastOffsetX = 0; lastOffsetY = 0;
+                // CLICK HANDLER
+                img.addEventListener('click', (e) => {
+                    const currentTime = new Date().getTime();
+                    const tapLength = currentTime - lastTap;
+
+                    if (tapLength < 300 || currentScale > 1) {
+                        currentScale = 1; offsetX = 0; offsetY = 0; lastOffsetX = 0; lastOffsetY = 0;
                         img.style.transform = 'scale(1) translate(0, 0)';
                         img.style.transition = 'transform 0.3s ease';
                         enableScrolling();
+                        lastTap = currentTime;
+                        return; 
                     }
                     lastTap = currentTime;
+
+                    // --- GRID CALCULATION ---
+                    const rect = img.getBoundingClientRect();
+                    const clickX = e.clientX - rect.left;
+                    const clickY = e.clientY - rect.top;
+                    const pctX = clickX / rect.width;
+                    const pctY = clickY / rect.height;
+
+                    const monthIndex = img.getAttribute('data-month');
+                    const config = calendarConfig[monthIndex];
+
+                    if (config) {
+                        if (pctX >= config.gridArea.xStart && pctX <= config.gridArea.xEnd &&
+                            pctY >= config.gridArea.yStart && pctY <= config.gridArea.yEnd) {
+                            
+                            const gridW = config.gridArea.xEnd - config.gridArea.xStart;
+                            const gridH = config.gridArea.yEnd - config.gridArea.yStart;
+                            
+                            // Basic Row/Col Calc
+                            const col = Math.floor(((pctX - config.gridArea.xStart) / gridW) * config.cols);
+                            const row = Math.floor(((pctY - config.gridArea.yStart) / gridH) * config.rows);
+                            
+                            let date;
+                            let foundCustom = false;
+                            // NEW: Check if Vertical (Indian Calendar Style)
+                            // if (config.isVertical) {
+                            //     // Vertical Logic: Date increases down the rows, then next column
+                            //     date = (col * config.rows) + row - config.startCellOffset + 1;
+                            // } else {
+                            //     // Standard Logic: Date increases across columns
+                            //     date = (row * config.cols) + col - config.startCellOffset + 1;
+                            // }
+
+                            // 1. Check if this specific click is in a "Custom Slot" (like 30 or 31)
+                            if (config.customSlots) {
+                                for (let slot of config.customSlots) {
+                                    if (slot.r === row && slot.c === col) {
+                                        date = slot.date;
+                                        foundCustom = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // 2. If not a custom slot, calculate normally
+                            if (!foundCustom) {
+                                if (config.isVertical) {
+                                    date = (col * config.rows) + row - config.startCellOffset + 1;
+                                } else {
+                                    date = (row * config.cols) + col - config.startCellOffset + 1;
+                                }
+                            }
+                            // --- NEW LOGIC ENDS HERE ---
+
+                            if (date > 0 && date <= 31) {
+                                const eventText = config.events[date] || "No specific events listed.";
+                                document.getElementById('dateModalTitle').innerText = `${date}/${monthIndex}/2025`;
+                                document.getElementById('dateModalContent').innerText = eventText;
+                                dateModal.style.display = 'flex';
+                            }
+                        }
+                    }
                 });
             };
-            
-            // Apply zoom logic to all images with the 'zoomable' class
-            document.querySelectorAll('.zoomable').forEach(applyZoomLogic);
-        });
 
+            // --- 4. UTILITIES (Same as before) ---
+            const scrollToMonth = (slider, monthIndex, behavior = 'smooth') => {
+                const image = slider.querySelector(`.calendar-img:not(.clone)[data-month='${monthIndex + 1}']`);
+                if (image) {
+                    const scrollPos = image.offsetLeft - (slider.offsetWidth - image.offsetWidth) / 2;
+                    slider.scrollTo({ left: scrollPos, behavior: behavior });
+                }
+            };
+            const setupContinuousSlider = (slider) => {
+                const container = slider.querySelector('.calendar-img-container');
+                Array.from(container.children).forEach(img => {
+                    const clone = img.cloneNode(true);
+                    clone.classList.add('clone');
+                    container.appendChild(clone);
+                });
+            };
+            const pauseAnimation = () => { topSlider.classList.add('paused'); bottomSlider.classList.add('paused'); };
+            const resumeAnimation = () => { topSlider.classList.remove('paused'); bottomSlider.classList.remove('paused'); };
+            const handleBannerInteraction = () => {
+                pauseAnimation(); clearTimeout(restartAutoplayTimer); 
+                restartAutoplayTimer = setTimeout(resumeAnimation, 5000);
+            };
+
+            [topSlider, bottomSlider].forEach(slider => slider.addEventListener('touchstart', handleBannerInteraction, { passive: true }));
+            
+            const getVisibleMonthIndex = (slider) => {
+                const sliderRect = slider.getBoundingClientRect();
+                const sliderCenter = sliderRect.left + sliderRect.width / 2;
+                let closestDist = Infinity, visibleIndex = 0;
+                slider.querySelectorAll('.calendar-img').forEach((img) => {
+                    const dist = Math.abs(sliderCenter - (img.getBoundingClientRect().left + img.offsetWidth/2));
+                    if (dist < closestDist) { closestDist = dist; visibleIndex = parseInt(img.dataset.month) - 1; }
+                });
+                return visibleIndex;
+            };
+
+            toggleIcon.addEventListener('click', () => {
+                const isFrontVisible = middleSliderFront.style.display !== 'none';
+                const activeSlider = isFrontVisible ? middleSliderFront : middleSliderBack;
+                const inactiveSlider = isFrontVisible ? middleSliderBack : middleSliderFront;
+                const currentMonthIndex = getVisibleMonthIndex(activeSlider);
+                activeSlider.style.display = 'none';
+                inactiveSlider.style.display = 'flex';
+                scrollToMonth(inactiveSlider, currentMonthIndex, 'auto');
+            });
+
+            document.querySelectorAll('#top-slider-front .calendar-img, #bottom-slider-front .calendar-img').forEach(img => {
+                img.addEventListener('click', (e) => {
+                    if(e.target.classList.contains('clone')) return;
+                    modal.style.display = 'flex';
+                    document.getElementById('modalImage').src = e.target.src;
+                });
+            });
+            document.getElementById('closeModal').addEventListener('click', () => modal.style.display = 'none');
+            document.getElementById('closeDateModal').addEventListener('click', () => dateModal.style.display = 'none');
+            dateModal.addEventListener('click', (e) => { if(e.target === dateModal) dateModal.style.display = 'none'; });
+            
+            document.getElementById('three-dot-menu').addEventListener('click', () => {
+                const el = document.getElementById('about-us-text');
+                el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+            });
+
+            window.addEventListener('load', () => {
+                setupContinuousSlider(topSlider);
+                setupContinuousSlider(bottomSlider);
+                scrollToMonth(middleSliderFront, initialMonthIndex, 'auto');
+                document.querySelectorAll('.zoomable').forEach(applyZoomLogic);
+            });
+        });
+        
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
-                    .then(reg => console.log('Service Worker registered:', reg))
-                    .catch(err => console.error('Service Worker registration failed:', err));
+                    .catch(err => console.error('SW failed:', err));
             });
         }
     </script>
