@@ -810,7 +810,7 @@
                                 dateModal.style.display = 'flex';
 
                                 // 5. AJAX Fetch
-                                const url = `/cal2025/get-events/?day=${date}&month=${monthIndex}&year=2025`;
+                                const url = `/cal2026/get-events/?day=${date}&month=${monthIndex}&year=2025`;
 
                                 fetch(url)
                                 .then(response => response.json())
@@ -841,7 +841,7 @@
                                             // 3. Create Edit Link (Pencil Icon)
                                             const editLink = document.createElement('a');
                                             // This URL must match the pattern in Step 2
-                                            editLink.href = `/cal2025/update-event/${evt.event_id}/`; 
+                                            editLink.href = `/cal2026/update-event/${evt.event_id}/`; 
                                             editLink.innerHTML = '<i class="fas fa-pencil-alt"></i>';
                                             editLink.style.cssText = "color: #005ba6; cursor: pointer; padding: 5px;";
                                             editLink.title = "Edit Event";
@@ -1016,7 +1016,7 @@
         
         // if ('serviceWorker' in navigator) {
         //     window.addEventListener('load', () => {
-        //         navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
+        //         navigator.serviceWorker.register('/cal2026/static/js/serviceworker.js')
         //             .catch(err => console.error('SW failed:', err));
         //     });
         // }

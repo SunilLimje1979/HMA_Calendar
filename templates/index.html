@@ -67,7 +67,7 @@
         const appContainer = document.querySelector("#app-container");
 
         // URL to redirect after the app is installed
-        const redirectUrl = "/cal2025/calendar/";
+        const redirectUrl = "/cal2026/calendar/";
 
         // Debugging message to check the standalone mode
         console.log("Checking if app is installed: ", window.matchMedia('(display-mode: standalone)').matches);
@@ -276,14 +276,14 @@
                 <li>Follow the on-screen prompts to confirm and add the app to your home screen.</li>
             </ol>
             br/>
-            <a href="https://hadapsarmedicalassociation.com/cal2025/static/images/ioshelp.mp4" target="_blank">Watch This Video</a>
+            <a href="https://hadapsarmedicalassociation.com/cal2026/static/images/ioshelp.mp4" target="_blank">Watch This Video</a>
         </div>
     </div>
 
     <script>
         let installPrompt = null;
         const installButton = document.querySelector("#install");
-        const redirectUrl = "/cal2025/calendar/";
+        const redirectUrl = "/cal2026/calendar/";
 
         /**
          * Check if the app is running in standalone mode or already installed
@@ -355,7 +355,7 @@
         const iosModal = document.getElementById("ios-install-modal");
         const showModalBtn = document.getElementById("show-ios-install-modal");
         const closeModalBtn = iosModal.querySelector(".close-btn");
-        {% comment %} const redirectUrl = "/cal2025/calendar/"; {% endcomment %}
+        {% comment %} const redirectUrl = "/cal2026/calendar/"; {% endcomment %}
 
         function isIos() {
             return /iphone|ipad|ipod/.test(navigator.userAgent.toLowerCase());
@@ -392,7 +392,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/cal2025/static/js/serviceworker.js')
+                navigator.serviceWorker.register('/cal2026/static/js/serviceworker.js')
                     .then((reg) => {
                         console.log('Service Worker registered:', reg);
                     })

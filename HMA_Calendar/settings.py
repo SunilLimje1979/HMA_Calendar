@@ -130,9 +130,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 
-STATIC_URL = "/cal2025/static/"
+STATIC_URL = "/cal2026/static/"
 STATICFILES_DIRS = [
-    BASE_DIR / "cal2025/static",
+    BASE_DIR / "cal2026/static",
 ]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -148,7 +148,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'cal2025/static/js', 'serviceworker.js')
+# PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'cal2026/static/js', 'serviceworker.js')
 #PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
 # 1. Set the session age to 1 Year (in seconds)
