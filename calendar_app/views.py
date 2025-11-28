@@ -30,7 +30,7 @@ def login(request):
         if request.user.is_authenticated:
             # Redirect directly to 'login' (This creates a clean URL)
             return redirect('demo')
-        return render(request, 'loginsignup.html')
+        return render(request, 'loginSignup.html')
 
     else:
         # 1. Fetch data from the form
@@ -113,7 +113,7 @@ def signup(request):
         if request.user.is_authenticated:
            return redirect('demo')
         
-        return render(request, 'loginsignup.html')
+        return render(request, 'loginSignup.html')
 
 
 def logout_view(request):
