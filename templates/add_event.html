@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Add New Event</title>
+    <link rel="shortcut icon" href="{% static '/images/HMALogo.png' %}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <style>
+        /* --- Shared Variables (Matching Login Page) --- */
+        :root {
+            --primary-color: #1e3a8a; /* Deep Blue */
+            --primary-hover-color: #162c6b;
+            --secondary-color: #d32f2f;
+            --border-color: #ced4da;
+            --text-color: #495057;
+            --bg-color: #eef2f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            color: white;
+        }
+
+        .nav-back-btn {
+            color: #ffffff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+        }
+
+        .nav-back-btn:hover { background-color: rgba(255, 255, 255, 0.2); }
+        .nav-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 0.5px; }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            margin-top: 80px; /* Space for navbar */
+            padding: 1rem;
+            width: 100%;
+            max-width: 500px;
+            align-self: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 2rem 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        /* --- DATE HEADER --- */
+        .date-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        .date-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .date-header p { font-size: 0.9rem; color: #777; }
+
+        /* --- FLOATING LABEL FORM --- */
+        .form-group { position: relative; margin-bottom: 1.5rem; }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            transition: border-color 0.2s;
+            color: #333;
+        }
+
+        /* Textarea specific */
+        textarea.form-input {
+            resize: none;
+            height: 120px;
+        }
+
+        .form-label {
+            position: absolute;
+            top: 14px;
+            left: 12px;
+            background-color: #ffffff;
+            padding: 0 5px;
+            color: #777;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            pointer-events: none; /* Allows clicking through to input */
+        }
+
+        /* Floating Logic */
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: -10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        /* Handle Time Input specifically (it always has value/placeholder) */
+        input[type="time"].form-input + .form-label {
+            top: -10px;
+            left: 10px;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-input:focus { outline: none; border-color: var(--primary-color); }
+
+        /* --- BUTTON --- */
+        .action-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 0.5rem;
+        }
+
+        .action-button:hover { background-color: var(--primary-hover-color); }
+        
+        .action-button:disabled {
+            background-color: #9aa0a6;
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        /* --- AUTOFILL FIX --- */
+        .form-input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- <a href="{% url 'demo' %}" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a> -->
+        <a href="{% url 'demo' %}" class="nav-back-btn" onclick="history.back(); return false;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <span class="nav-title">Add Event</span>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            
+            <!-- Date Display (One Line) -->
+            <div class="date-header">
+                <h2><i class="far fa-calendar-alt"></i> &nbsp; {{ day }}/{{ month }}/{{ year }}</h2>
+                <p>Create a new reminder</p>
+            </div>
+
+            <form method="POST" action="{% url 'add_event' %}" id="addEventForm" autocomplete="off">
+                {% csrf_token %}
+                
+                <!-- Hidden inputs -->
+                <input type="hidden" name="day" value="{{ day }}">
+                <input type="hidden" name="month" value="{{ month }}">
+                <input type="hidden" name="year" value="{{ year }}">
+
+                <!-- Event Title -->
+                <div class="form-group">
+                    <input type="text" id="evtTitle" name="event_title" class="form-input" placeholder=" " required>
+                    <label for="evtTitle" class="form-label">Event Title</label>
+                </div>
+
+                <!-- Event Time (Optional) -->
+                <div class="form-group">
+                    <input type="time" id="evtTime" name="event_time" class="form-input">
+                    <label for="evtTime" class="form-label">Time (Optional)</label>
+                </div>
+
+                <!-- Event Details -->
+                <div class="form-group">
+                    <textarea id="evtDetails" name="event_details" class="form-input" placeholder=" "></textarea>
+                    <label for="evtDetails" class="form-label">Details / Notes</label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="action-button" id="btnSubmit">
+                    SAVE EVENT
+                </button>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Script to handle Form Submission -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('addEventForm');
+            const btn = document.getElementById('btnSubmit');
+
+            form.addEventListener('submit', function(e) {
+                // The form is valid (HTML5 'required' attribute handles empty title)
+                
+                // Disable button to prevent double clicks
+                btn.disabled = true;
+                
+                // Change text to show processing
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
+
+                // Allow form to submit naturally
+            });
+            
+            // Optional: Reset button if page is loaded from Back-Cache
+            window.addEventListener('pageshow', function(event) {
+                btn.disabled = false;
+                btn.innerHTML = 'SAVE EVENT';
+            });
+        });
+    </script>
+
+</body>
+</html>

@@ -76,10 +76,21 @@ WSGI_APPLICATION = 'HMA_Calendar.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+DATABASES = { 
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'HMACalendar_db',
+        'USER': 'postgres',
+        'PASSWORD': 'Medicify@2024',
+        'HOST': '15.206.32.93',
+        'PORT': '5432',
     }
 }
 
@@ -137,5 +148,17 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'cal2025/static/js', 'serviceworker.js')
+# PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'cal2025/static/js', 'serviceworker.js')
 #PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
+
+# 1. Set the session age to 1 Year (in seconds)
+# 60 * 60 * 24 * 365 = 31536000 seconds
+SESSION_COOKIE_AGE = 31536000 
+
+# 2. Ensure the session does NOT expire when the browser closes
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# 3. (Optional but Recommended) Refresh the session timer on every request
+# If a user visits the site, their "1 year" countdown resets to the beginning.
+SESSION_SAVE_EVERY_REQUEST = True
+

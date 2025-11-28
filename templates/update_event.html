@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>Update Event</title>
+    <link rel="shortcut icon" href="{% static '/images/HMALogo.png' %}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <style>
+        /* --- Shared Variables --- */
+        :root {
+            --primary-color: #1e3a8a; /* Deep Blue */
+            --primary-hover-color: #162c6b;
+            --secondary-color: #d32f2f; /* Red for Remove */
+            --secondary-hover: #b71c1c;
+            --border-color: #ced4da;
+            --text-color: #495057;
+            --bg-color: #eef2f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Try to prevent scrolling */
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px; /* Reduced height slightly */
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+            color: white;
+        }
+
+        .nav-back-btn {
+            color: #ffffff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            margin-right: 10px;
+        }
+
+        .nav-title { font-size: 1.1rem; font-weight: 500; letter-spacing: 0.5px; }
+
+        /* --- MAIN CONTAINER --- */
+        .container {
+            margin-top: 30px; /* Matches navbar */
+            padding: 0.8rem;
+            width: 100%;
+            max-width: 500px;
+            align-self: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Vertically center the card */
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 1.5rem 1.2rem; /* Reduced padding */
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+
+        /* --- DATE HEADER --- */
+        .date-header {
+            text-align: center;
+            margin-bottom: 1.2rem; /* Reduced margin */
+            color: var(--primary-color);
+        }
+        .date-header h2 {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        .date-header p { font-size: 0.85rem; color: #777; }
+
+        /* --- FLOATING LABEL FORM --- */
+        .form-group { position: relative; margin-bottom: 1.5rem; }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 12px; /* Slightly compact */
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            transition: border-color 0.2s;
+            color: #333;
+        }
+
+        /* Textarea specific - Reduced height for fit */
+        textarea.form-input {
+            resize: none;
+            height: 120px; 
+        }
+
+        .form-label {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background-color: #ffffff;
+            padding: 0 5px;
+            color: #777;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            pointer-events: none; 
+        }
+
+        /* Floating Logic */
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label {
+            top: -9px;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        input[type="time"].form-input + .form-label {
+            top: -9px;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-input:focus { outline: none; border-color: var(--primary-color); }
+
+        /* --- BUTTONS --- */
+        .btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px; /* Space between buttons */
+            margin-top: 0.5rem;
+        }
+
+        .action-button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Update Button */
+        .btn-update {
+            background-color: var(--primary-color);
+            color: #ffffff;
+        }
+        .btn-update:hover { background-color: var(--primary-hover-color); }
+
+        /* Remove Button */
+        .btn-remove {
+            background-color: var(--secondary-color);
+            color: #ffffff;
+        }
+        .btn-remove:hover { background-color: var(--secondary-hover); }
+
+        /* Autofill Fix */
+        .form-input:-webkit-autofill {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <!-- <a href="{% url 'demo' %}" class="nav-back-btn">
+            <i class="fas fa-arrow-left"></i>
+        </a> -->
+        <a href="{% url 'demo' %}" class="nav-back-btn" onclick="history.back(); return false;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <span class="nav-title">Update Event</span>
+    </nav>
+
+    <div class="container">
+        <div class="card">
+            
+            <!-- Date Display -->
+            <div class="date-header">
+                <h2><i class="far fa-calendar-alt"></i> &nbsp; {{ day }}/{{ month }}/{{ year }}</h2>
+                <p>Modify your existing event</p>
+            </div>
+
+            <!-- UPDATE FORM -->
+            <form method="POST" action="{% url 'update_event' event.event_id %}" id="updateEventForm" autocomplete="off">
+                {% csrf_token %}
+                
+                <!-- Event Title -->
+                <div class="form-group">
+                    <input type="text" id="evtTitle" name="event_title" class="form-input" 
+                           placeholder=" " required 
+                           value="{{ event.event_title }}">
+                    <label for="evtTitle" class="form-label">Event Title</label>
+                </div>
+
+                <!-- Event Time -->
+                <div class="form-group">
+                    <input type="time" id="evtTime" name="event_time" class="form-input"
+                           value="{{ existing_time }}">
+                    <label for="evtTime" class="form-label">Time (Optional)</label>
+                </div>
+
+                <!-- Event Details -->
+                <div class="form-group">
+                    <textarea id="evtDetails" name="event_details" class="form-input" placeholder=" ">{{ event.event_details }}</textarea>
+                    <label for="evtDetails" class="form-label">Details / Notes</label>
+                </div>
+
+                <!-- Buttons Container -->
+                <div class="btn-container">
+                    <!-- Update Button -->
+                    <button type="submit" class="action-button btn-update" id="btnUpdate">
+                        Update Event
+                    </button>
+                    
+                    <!-- Remove Button (Triggers JS) -->
+                    <button type="button" class="action-button btn-remove" id="btnRemove">
+                        Remove Event
+                    </button>
+                </div>
+
+            </form>
+            
+            <!-- Hidden Remove Form -->
+            <form id="removeEventForm" action="{% url 'remove_event' event.event_id %}" method="POST" style="display: none;">
+                {% csrf_token %}
+            </form>
+
+        </div>
+    </div>
+
+    <!-- SweetAlert2 Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Logic Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateForm = document.getElementById('updateEventForm');
+            const removeForm = document.getElementById('removeEventForm');
+            const btnUpdate = document.getElementById('btnUpdate');
+            const btnRemove = document.getElementById('btnRemove');
+
+            // --- Handle Update ---
+            updateForm.addEventListener('submit', function(e) {
+                btnUpdate.disabled = true;
+                btnUpdate.innerHTML = '<i class="fas fa-spinner fa-spin"></i> UPDATING...';
+            });
+
+            // --- Handle Remove ---
+            btnRemove.addEventListener('click', function() {
+                Swal.fire({
+                    title: 'Do you want to remove the event?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33', // Red for Yes
+                    cancelButtonColor: '#1e3a8a', // Blue for No
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    reverseButtons: true // Moves Yes to the right or left depending on OS preference, usually cleaner
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Submit the hidden remove form
+                        removeForm.submit();
+                    }
+                    // If dismissed (No), nothing happens, alert closes automatically
+                });
+            });
+            
+            // Reset update button if page is loaded from Back-Cache
+            window.addEventListener('pageshow', function(event) {
+                btnUpdate.disabled = false;
+                btnUpdate.innerHTML = 'UPDATE EVENT';
+            });
+        });
+    </script>
+
+</body>
+</html>

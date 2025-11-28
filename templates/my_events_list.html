@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+    <title>My Events</title>
+    <link rel="shortcut icon" href="{% static '/images/HMALogo.png' %}">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #1e3a8a;
+            --primary-hover: #162c6b;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-top: 60px; /* Space for Navbar */
+        }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Pushes items to edges */
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+            color: white;
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 10px; }
+        .nav-back-btn { color: white; font-size: 1.2rem; text-decoration: none; }
+        .nav-title { font-size: 1.1rem; font-weight: 500; }
+        
+        .nav-right-btn {
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* --- SEARCH & FILTER AREA --- */
+        .search-area {
+            background: white;
+            padding: 10px 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 60px;
+            z-index: 900;
+            width: 100%;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            padding-right: 35px;
+            border-radius: 20px;
+            border: 1px solid var(--border-color);
+            background: #f9f9f9;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .filter-toggle-btn {
+            width: 40px;
+            height: 40px;
+            min-width: 40px; /* Prevent shrinking */
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Filter Options - Mobile Fix */
+        .filter-options {
+            display: none;
+            padding-top: 10px;
+            animation: slideDown 0.3s ease-out;
+            overflow: hidden; /* Contains children */
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 5px;
+            flex-wrap: wrap; /* FIX: Allows wrapping on very small screens */
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 130px; /* Ensures inputs don't get too squashed */
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 0.85rem;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* --- EVENTS LIST --- */
+        .events-container {
+            padding: 1rem;
+            padding-bottom: 80px;
+        }
+
+        /* Month Group Header */
+        .month-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            padding-left: 5px;
+        }
+
+        .month-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .add-event-btn-small {
+            background-color: var(--primary-color);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
+        /* Event Card */
+        .event-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .event-left {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .event-title {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .event-meta {
+            font-size: 0.8rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .event-meta i { font-size: 0.75rem; color: var(--primary-color); }
+
+        .event-right {
+            margin-left: 10px;
+        }
+
+        .update-icon {
+            color: #777;
+            font-size: 1.1rem;
+            padding: 8px;
+            transition: color 0.2s;
+        }
+
+        .update-icon:hover { color: var(--primary-color); }
+
+        /* Empty State */
+        .no-events {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. Navbar -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <a href="{% url 'demo' %}" class="nav-back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <span class="nav-title">My Events</span>
+        </div>
+        <!-- Global Add Event Icon -->
+        <div class="nav-right-btn" onclick="openGlobalAddEvent()">
+            <i class="fas fa-plus"></i>
+        </div>
+    </nav>
+
+    <!-- 2. Search & Filter Section -->
+    <div class="search-area">
+        <form method="GET" action="{% url 'my_events_list' %}" id="filterForm">
+            <div class="search-row">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <input type="text" name="q" class="search-input" placeholder="Search events..." value="{{ search_query }}">
+                    <button type="submit" class="search-btn"><i class="fas fa-search"></i></button>
+                </div>
+                
+                <!-- Filter Toggle Icon -->
+                <div class="filter-toggle-btn" onclick="toggleFilter()" id="filterBtn">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+            </div>
+
+            <!-- Expandable Filter Options -->
+            <div class="filter-options" id="filterOptions" {% if filter_date or filter_month %}style="display:block"{% endif %}>
+                <p style="font-size:0.8rem; color:#666; margin-bottom:5px;">Filter by Date or Month:</p>
+                <div class="filter-group">
+                    <input type="date" name="filter_date" class="filter-input" value="{{ filter_date }}" placeholder="Specific Date" onchange="this.form.submit()">
+                    <input type="month" name="filter_month" class="filter-input" value="{{ filter_month }}" placeholder="Select Month" onchange="this.form.submit()">
+                </div>
+                <div style="text-align: right;">
+                    <a href="{% url 'my_events_list' %}" style="font-size:0.8rem; color:var(--primary-color); text-decoration:none;">Clear Filters</a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 3. Event List Grouped by Month -->
+    <div class="events-container">
+        
+        {% if grouped_events %}
+            {% for group in grouped_events %}
+                
+                <!-- Month Header -->
+                <div class="month-header">
+                    <span class="month-title">{{ group.month_name }}</span>
+                    <!-- 
+                       Calls JS function to prompt for date within this specific month 
+                    -->
+                    <div class="add-event-btn-small" onclick="openMonthAddEvent('{{ group.month_idx }}', '{{ group.year }}')">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
+
+                <!-- Events in this Month -->
+                {% for event in group.events %}
+                    <div class="event-card">
+                        <div class="event-left">
+                            <span class="event-title">{{ event.event_title }}</span>
+                            <div class="event-meta">
+                                <!-- Date and Time -->
+                                <span><i class="far fa-calendar"></i> {{ event.event_datetime|date:"d M" }}</span>
+                                <span><i class="far fa-clock"></i> {{ event.event_datetime|date:"H:i" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="event-right">
+                            <!-- Update Icon connecting to update_event view -->
+                            <a href="{% url 'update_event' event.event_id %}" class="update-icon">
+                                <i class="fas fa-pen"></i>
+                            </a>
+                        </div>
+                    </div>
+                {% endfor %}
+
+            {% endfor %}
+        
+        {% else %}
+            <!-- Empty State -->
+            <div class="no-events">
+                <i class="far fa-calendar-times" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>No events found.</p>
+                {% if search_query or filter_date or filter_month %}
+                    <p>Try clearing your filters.</p>
+                {% else %}
+                    <p>You have no upcoming events.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Store the base Add Event URL
+        const ADD_EVENT_URL = "{% url 'add_event' %}";
+
+        // 1. Toggle Filter Display
+        function toggleFilter() {
+            var options = document.getElementById('filterOptions');
+            var btn = document.getElementById('filterBtn');
+            
+            if (options.style.display === 'none' || options.style.display === '') {
+                options.style.display = 'block';
+                btn.classList.add('active');
+            } else {
+                options.style.display = 'none';
+                btn.classList.remove('active');
+            }
+        }
+
+        // 2. Global Add Event (Navbar) - Any Date >= Today
+        function openGlobalAddEvent() {
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            
+            Swal.fire({
+                title: 'Select Event Date',
+                input: 'date',
+                inputAttributes: {
+                    min: today // Prevent past dates
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Next',
+                confirmButtonColor: '#1e3a8a',
+                cancelButtonColor: '#d33',
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    redirectToAddEvent(result.value);
+                }
+            });
+        }
+
+        // 3. Month Specific Add Event - Restricted to that Month
+        function openMonthAddEvent(monthIdx, yearStr) {
+            const year = parseInt(yearStr);
+            const month = parseInt(monthIdx) - 1; // JS months are 0-11
+            
+            // Calculate Min and Max dates for this month
+            const now = new Date();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0); // Last day of month
+            
+            // If current month, start from today. Else start from 1st.
+            let minDateStr = firstDay.toISOString().split('T')[0];
+            if (year === now.getFullYear() && month === now.getMonth()) {
+                minDateStr = now.toISOString().split('T')[0];
+            }
+
+            const maxDateStr = lastDay.toISOString().split('T')[0];
+
+            Swal.fire({
+                title: 'Select Date',
+                text: `Adding event for ${firstDay.toLocaleString('default', { month: 'long' })} ${year}`,
+                input: 'date',
+                inputValue: minDateStr, // Default value
+                inputAttributes: {
+                    min: minDateStr,
+                    max: maxDateStr
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Next',
+                confirmButtonColor: '#1e3a8a',
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    redirectToAddEvent(result.value);
+                }
+            });
+        }
+
+        // Helper to parse date and redirect
+        function redirectToAddEvent(dateStr) {
+            // dateStr is YYYY-MM-DD
+            const dateObj = new Date(dateStr);
+            const day = dateObj.getDate();
+            const month = dateObj.getMonth() + 1; // Backend expects 1-12
+            const year = dateObj.getFullYear();
+
+            // Construct URL: add_event?day=28&month=11&year=2025
+            window.location.href = `${ADD_EVENT_URL}?day=${day}&month=${month}&year=${year}`;
+        }
+    </script>
+
+</body>
+</html>

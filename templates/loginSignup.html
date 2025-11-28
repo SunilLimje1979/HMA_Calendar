@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HMA Login & Signup</title>
+    <link rel="shortcut icon" href="{% static '/images/HMALogo.png' %}">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    
+    <!-- SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css">
+
+    <style>
+        /* --- Color Variables --- */
+        :root {
+            --primary-color: #1e3a8a; 
+            --primary-hover-color: #162c6b;
+            --secondary-color: #d32f2f; 
+            --border-color: #ced4da;
+            --text-color: #495057;
+            --bg-color: #eef2f5;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            perspective: 1000px;
+            overflow-x: hidden; 
+        }
+
+        /* --- ADDED: SIMPLE NAVBAR --- */
+        .simple-navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px; /* Compact height */
+            background-color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000; /* Ensures it stays on top */
+        }
+
+        .nav-back-btn {
+            color: #ffffff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+        }
+
+        .nav-back-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* --- FLIP CONTAINER STRUCTURE --- */
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            min-height: 600px; 
+            transform-style: preserve-3d;
+            /* Added margin-top to ensure it doesn't hit the navbar on very small screens */
+            margin-top: 20px; 
+        }
+
+        .flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+
+        /* This class activates the flip */
+        .flipper.flip-active {
+            transform: rotateY(180deg);
+        }
+
+        .login-card, .signup-card {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0;
+            background-color: #ffffff;
+            padding: 2.5rem 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.1);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+
+        .signup-card {
+            transform: rotateY(180deg);
+        }
+
+        /* --- LOGO & HEADER --- */
+        .logo-section { text-align: center; margin-bottom: 1rem; }
+        
+        .logo-image { 
+            max-width: 180px; 
+            height: auto; 
+            border-radius: 12px; 
+        }
+        
+        .header-section { text-align: center; margin-bottom: 1.5rem; }
+        .header-section h1 { font-size: 1.2rem; font-weight: 600; color: var(--primary-color); margin-bottom: 0.2rem; }
+        .header-section p { font-size: 0.9rem; color: var(--secondary-color); font-weight: 500; }
+
+        /* --- FORM GRID --- */
+        .row-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* --- INPUT STYLING --- */
+        .form-group { position: relative; margin-bottom: 1.2rem; }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 0.95rem;
+            font-family: 'Poppins', sans-serif;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+
+        .form-label {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            transform: translateY(-50%);
+            background-color: #ffffff;
+            padding: 0 5px;
+            color: #777;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+
+        .form-input:focus + .form-label,
+        .form-input:not(:placeholder-shown) + .form-label,
+        .form-input:-webkit-autofill + .form-label {
+            top: 0;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .form-input:focus { outline: none; border-color: var(--primary-color); }
+        
+        /* Force Autofill Background to White */
+        .form-input:-webkit-autofill,
+        .form-input:-webkit-autofill:hover, 
+        .form-input:-webkit-autofill:focus, 
+        .form-input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px white inset !important;
+            -webkit-text-fill-color: var(--text-color) !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* --- PASSWORD TOGGLE --- */
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #555;
+            z-index: 10;
+        }
+
+        /* --- BUTTONS --- */
+        .action-button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 0.5rem;
+        }
+        .action-button:hover { background-color: var(--primary-hover-color); }
+        .action-button:disabled { background-color: #9aa0a6; cursor: not-allowed; }
+
+        /* --- TOGGLE LINKS --- */
+        .toggle-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        .toggle-link a {
+            color: var(--secondary-color);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .toggle-link a:hover { text-decoration: underline; }
+
+        /* --- RESPONSIVE ADJUSTMENTS --- */
+        @media (max-width: 480px) {
+            .row-grid { grid-template-columns: 1fr; gap: 0; }
+            .login-container { min-height: 550px; } 
+            .login-card, .signup-card { padding: 1.5rem 1.2rem; }
+            .logo-image { max-width: 130px; }
+            .logo-section { margin-bottom: 0.5rem; }
+            .header-section { margin-bottom: 1rem; }
+            .form-group { margin-bottom: 1.1rem; }
+            .form-input { padding: 12px 10px; }
+            .action-button { margin-top: 0.2rem; }
+            .toggle-link { margin-top: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ADDED: Simple Navbar -->
+<nav class="simple-navbar">
+    <!-- Points to /demo/ url, replace with {% url 'demo' %} if you have the name configured -->
+    <a href="{% url 'demo' %}" class="nav-back-btn">
+        <i class="fa-solid fa-arrow-left"></i>
+    </a>
+</nav>
+
+<main class="login-container">
+    <!-- 
+      UPDATED: Logic to auto-flip based on URL.
+      If the current URL (request.path) contains 'signup', 
+      it adds the 'flip-active' class immediately.
+    -->
+    <div class="flipper {% if 'signup' in request.path %}flip-active{% endif %}" id="flipperCard">
+        
+        <!-- ================= LOGIN (FRONT) ================= -->
+        <div class="login-card">
+            <div class="logo-section">
+                <img src="{% static '/images/HMALogo.png' %}" alt="Logo" class="logo-image">
+            </div>
+            <div class="header-section">
+                <p>User Login</p>
+            </div>
+
+            <form id="loginForm" method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <input type="text" id="loginUid" name="username" class="form-input"  placeholder=" " required>
+                    <label for="loginUid" class="form-label">Username</label>
+                </div>
+
+                <div class="form-group">
+                    <input type="password" id="loginPass" name="password" class="form-input" placeholder=" " required>
+                    <label for="loginPass" class="form-label">Password</label>
+                    <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('loginPass', this)"></i>
+                </div>
+
+                <button type="submit" class="action-button" id="btnLogin">LOGIN</button>
+
+                <div class="toggle-link">
+                    If no account? <a onclick="flipCard()">Please Sign up</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- ================= SIGNUP (BACK) ================= -->
+        <div class="signup-card">
+            <div class="logo-section">
+                <img src="{% static 'images/HMALogo.png' %}" alt="Logo" class="logo-image">
+            </div>
+            <div class="header-section">
+                <p>New Registration</p>
+            </div>
+
+            <form id="signupForm" method="POST" action="{% url 'signup' %}" autocomplete="off">
+                {% csrf_token %}
+                
+                <div class="row-grid">
+                    <div class="form-group">
+                        <input type="text" id="regName" name="full_name" class="form-input" placeholder=" " required>
+                        <label for="regName" class="form-label">Full Name</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="number" id="regPhone" name="phone_number" class="form-input" placeholder=" " required 
+                               maxlength="10" 
+                               oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);">
+                        <label for="regPhone" class="form-label">Phone Number</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="text" id="regUid" name="username" class="form-input" placeholder=" " required autocomplete="off">
+                    <label for="regUid" class="form-label">Create Username</label>
+                </div>
+
+                <div class="row-grid">
+                    <div class="form-group">
+                        <input type="password" id="regPass" name="password" class="form-input" placeholder=" " required autocomplete="new-password">
+                        <label for="regPass" class="form-label">Password</label>
+                        <i class="fa-solid fa-eye-slash toggle-password" onclick="togglePass('regPass', this)"></i>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="regConfirmPass" name="confirm_password" class="form-input" placeholder=" " required>
+                        <label for="regConfirmPass" class="form-label">Confirm Password</label>
+                    </div>
+                </div>
+
+                <button type="submit" class="action-button" id="btnSignup">SIGN UP</button>
+
+                <div class="toggle-link">
+                    Already have an account? <a onclick="flipCard()">Login here</a>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</main>
+
+<!-- SweetAlert Script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
+
+<script>
+    // --- 1. Flip Animation Logic ---
+    function flipCard() {
+        const flipper = document.getElementById('flipperCard');
+        flipper.classList.toggle('flip-active');
+    }
+
+    // --- 2. Password Visibility Toggle ---
+    function togglePass(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            iconElement.classList.remove('fa-eye-slash');
+            iconElement.classList.add('fa-eye');
+        } else {
+            input.type = "password";
+            iconElement.classList.remove('fa-eye');
+            iconElement.classList.add('fa-eye-slash');
+        }
+    }
+
+    // --- 3. Login Validation ---
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const user = document.getElementById('loginUid').value.trim();
+        const pass = document.getElementById('loginPass').value.trim();
+        const btn = document.getElementById('btnLogin');
+
+        if(!user || !pass){
+            e.preventDefault();
+            swal("Error", "Username and Password are required", "error");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+    });
+
+    // --- 4. Signup Validation ---
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+        const phone = document.getElementById('regPhone').value.trim();
+        const pass = document.getElementById('regPass').value;
+        const confirmPass = document.getElementById('regConfirmPass').value;
+        const btn = document.getElementById('btnSignup');
+        
+        // A. Phone Number Validation
+        if (phone.length !== 10) {
+            e.preventDefault();
+            swal("Invalid Phone", "Phone number must be exactly 10 digits.", "error");
+            return;
+        }
+
+        // B. Password Match Validation
+        if (pass !== confirmPass) {
+            e.preventDefault();
+            swal("Password Mismatch", "Password and Confirm Password do not match.", "error");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+    });
+</script>
+
+<script>
+    // Existing code...
+
+    // --- Add this block to clear forms on Back Navigation ---
+    window.addEventListener('pageshow', function(event) {
+        // 'event.persisted' is true if the page was restored from the bfcache (Back button)
+        // But we can just reset the forms every time the page shows to be safe.
+        
+        var loginForm = document.getElementById('loginForm');
+        var signupForm = document.getElementById('signupForm');
+
+        if (loginForm) {
+            loginForm.reset();
+        }
+        if (signupForm) {
+            signupForm.reset();
+        }
+    });
+</script>
+
+<!-- --- 5. Django Messages --- -->
+{% if messages %}
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+      {% for message in messages %}
+        var msg = "{{ message|escapejs }}";
+        var tag = "{{ message.tags }}";
+        var alertType = "info";
+        var alertTitle = "Info";
+
+        if (tag.includes("success")) { alertType = "success"; alertTitle = "Success!"; }
+        else if (tag.includes("danger") || tag.includes("error")) { alertType = "error"; alertTitle = "Error!"; }
+        else if (tag.includes("warning")) { alertType = "warning"; alertTitle = "Warning!"; }
+
+        swal({ title: alertTitle, text: msg, type: alertType, showConfirmButton: true });
+      {% endfor %}
+  });
+</script>
+{% endif %}
+
+</body>
+</html>
