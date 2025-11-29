@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pwa',
     'calendar_app',
+    'adminapp',
+    'active_link',
 ]
 
 MIDDLEWARE = [

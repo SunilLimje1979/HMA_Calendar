@@ -1,0 +1,134 @@
+{% extends "adminpanel/adminBase.html" %}
+
+{% block content %}
+
+<div class="content container-fluid">
+   <div class="page-header">
+      
+   </div>
+   <div class="row">
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-one w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-users"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{{counts.total_count}}</h3>
+                     <h6>Total Registered</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      
+
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-two w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-calendar-days"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{{counts.event_count}}</h3>
+                     <h6>Events</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      
+      <!-- <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-three w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-house-user"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{{counts.companies_count}}</h3>
+                     <h6>Companies</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-one w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-house-medical"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{{counts.offerletters_count}}</h3>
+                     <h6>Offers</h6>
+                  </div>
+               </div>
+            </div>
+         </div> -->
+      </div>
+
+      <!-- <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-three w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-xmark"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{%if data.pharma_status_counts.3 %} {{data.pharma_status_counts.3}} {%else%} 0 {%endif%}</h3>
+                     <h6>Canceled</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-four w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-thumbs-down"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{%if data.pharma_status_counts.4 %} {{data.pharma_status_counts.4}} {%else%} 0 {%endif%}</h3>
+                     <h6>Rejected</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <div class="col-xl-3 col-sm-6 col-12 d-flex">
+         <div class="card bg-four w-100">
+            <div class="card-body">
+               <div class="db-widgets d-flex justify-content-between align-items-center">
+                  <div class="db-icon">
+                     <i class="fa-solid fa-hourglass-end"></i>
+                  </div>
+                  <div class="db-info">
+                     <h3>{%if data.pharma_status_counts.5 %} {{data.pharma_status_counts.5}} {%else%} 0 {%endif%}</h3>
+                     <h6>Expired</h6>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div> -->
+
+
+   </div> 
+
+    
+  
+   
+</div>
+
+{% endblock content %}

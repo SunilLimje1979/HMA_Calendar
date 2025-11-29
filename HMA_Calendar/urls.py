@@ -24,5 +24,6 @@ urlpatterns = [
     # path('HMA_Calendar/',include('calendar_app.urls')),
     path('cal2026/admin/', admin.site.urls),
     path('cal2026/', include('calendar_app.urls')),
+    path('adminpanel/', include('adminapp.urls')),
     path('', include('pwa.urls')),
 ]+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -74,6 +74,9 @@ class EventManagement(models.Model):
     event_date = models.IntegerField(null=True,blank=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+    #the user who is superuser or isstaff can add a event to visible to all or specific user from adminpanel
+    circulate_to_all = models.BooleanField(default=False)
+
     #############Bydefault fields####################
     created_on = models.DateTimeField(auto_now_add=True)
     created_by = models.IntegerField(null=True, blank=True)
@@ -90,8 +93,35 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, unique=True) # Unique ensures no duplicates
 
+    #############Bydefault fields####################
+    created_on = models.DateTimeField(auto_now_add=True)
+    created_by = models.IntegerField(null=True, blank=True)
+    last_modified_on = models.DateTimeField(auto_now=True)
+    last_modified_by = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_by = models.IntegerField(null=True, blank=True)
+    deleted_reason = models.CharField(max_length=100, blank=True, null=True)
+   
     class Meta:
        db_table = 'UserProfile'
 
     def __str__(self):
         return self.user.username
+
+
+class EventCirculation(models.Model):
+    event = models.ForeignKey(EventManagement, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    #############Bydefault fields####################
+    created_on = models.DateTimeField(auto_now_add=True)
+    created_by = models.IntegerField(null=True, blank=True)
+    last_modified_on = models.DateTimeField(auto_now=True)
+    last_modified_by = models.IntegerField(null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
+    deleted_by = models.IntegerField(null=True, blank=True)
+    deleted_reason = models.CharField(max_length=100, blank=True, null=True)
+   
+
+    class Meta:
+        db_table = 'EventCirculation'
